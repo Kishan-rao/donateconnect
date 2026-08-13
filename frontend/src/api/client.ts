@@ -10,11 +10,16 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-let inMemoryToken: string | null = null;
+let inMemoryToken: string | null = localStorage.getItem('dc-token');
 let logoutCallback: (() => void) | null = null;
 
 export const setAuthTokenInMemory = (token: string | null) => {
   inMemoryToken = token;
+  if (token) {
+    localStorage.setItem('dc-token', token);
+  } else {
+    localStorage.removeItem('dc-token');
+  }
 };
 
 export const registerLogoutCallback = (cb: () => void) => {
@@ -23,8 +28,9 @@ export const registerLogoutCallback = (cb: () => void) => {
 
 // Request Interceptor: Attach JWT Bearer token
 apiClient.interceptors.request.use((config) => {
-  if (inMemoryToken) {
-    config.headers.Authorization = `Bearer ${inMemoryToken}`;
+  const activeToken = inMemoryToken || localStorage.getItem('dc-token');
+  if (activeToken) {
+    config.headers.Authorization = `Bearer ${activeToken}`;
   }
   return config;
 });

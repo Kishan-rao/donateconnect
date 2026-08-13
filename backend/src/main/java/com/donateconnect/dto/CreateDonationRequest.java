@@ -1,7 +1,7 @@
 package com.donateconnect.dto;
 
 import com.donateconnect.entity.Category;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,9 +23,13 @@ public class CreateDonationRequest {
     @NotNull(message = "Category is required")
     private Category category;
 
+    @NotBlank(message = "Description is required")
+    @Size(min = 20, max = 2000, message = "Description must be between 20 and 2000 characters")
     private String description;
 
+    @Size(max = 10, message = "Cannot upload more than 10 photos per donation")
     private List<String> photoUrls;
 
+    @FutureOrPresent(message = "Pickup date must be today or in the future")
     private LocalDate pickupDate;
 }

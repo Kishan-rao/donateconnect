@@ -13,13 +13,13 @@ import com.donateconnect.repository.UserRepository;
 import com.donateconnect.service.DonationCommentService;
 import com.donateconnect.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,15 +32,14 @@ public class DonationCommentServiceImpl implements DonationCommentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DonationCommentDto> getCommentsByDonationId(UUID donationId, UUID currentUserId) {
+    public Page<DonationCommentDto> getCommentsByDonationId(UUID donationId, UUID currentUserId, Pageable pageable) {
         Donation donation = donationRepository.findById(donationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Donation not found with id: " + donationId));
 
         verifyAccess(donation, currentUserId);
 
-        return commentRepository.findByDonationIdOrderByCreatedAtAsc(donationId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return commentRepository.findByDonationIdOrderByCreatedAtAsc(donationId, pageable)
+                .map(this::mapToDto);
     }
 
     @Override

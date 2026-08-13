@@ -153,7 +153,7 @@ export const AdminDonationsPage: React.FC = () => {
       {loading ? (
         <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800">
           <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">Fetching audit records from PostgreSQL...</p>
+          <p className="text-slate-400 text-sm">Fetching audit records...</p>
         </div>
       ) : error ? (
         <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center text-rose-400 space-y-3">

@@ -78,21 +78,30 @@ public class DonationServiceImpl implements DonationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DonationResponseDto> getDonationsByDonor(UUID donorUserId) {
-        return donationRepository.findByDonorIdOrderByCreatedAtDesc(donorUserId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<DonationResponseDto> getDonationsByDonor(UUID donorUserId, Pageable pageable) {
+        return donationRepository.findByDonorIdOrderByCreatedAtDesc(donorUserId, pageable)
+                .map(this::mapToDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DonationResponseDto> getDonationsByNgoUser(UUID ngoUserId) {
+    public DonationResponseDto getDonationByDonorAndId(UUID donorUserId, UUID donationId) {
+        // findByIdAndDonorId returns empty if the donation does not exist OR belongs
+        // to a different donor — both are surfaced as 404 to avoid leaking ownership.
+        Donation donation = donationRepository.findByIdAndDonorId(donationId, donorUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Donation not found or does not belong to the current user"));
+        return mapToDto(donation);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DonationResponseDto> getDonationsByNgoUser(UUID ngoUserId, Pageable pageable) {
         NGOProfile ngoProfile = ngoProfileRepository.findByUserId(ngoUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("NGO profile not found for user id: " + ngoUserId));
 
-        return donationRepository.findByNgoIdOrderByCreatedAtDesc(ngoProfile.getId()).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return donationRepository.findByNgoIdOrderByCreatedAtDesc(ngoProfile.getId(), pageable)
+                .map(this::mapToDto);
     }
 
     @Override

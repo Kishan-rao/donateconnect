@@ -13,12 +13,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ donationId, curren
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const { showToast } = useToast();
+  const { showSuccess, showError } = useToast();
 
   const fetchComments = async () => {
     try {
-      const data = await getDonationComments(donationId);
-      setComments(data);
+      const pageResponse = await getDonationComments(donationId, 0, 100);
+      setComments(pageResponse.content);
     } catch {
       // Ignore if unauthenticated
     } finally {
@@ -41,9 +41,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ donationId, curren
       const created = await addDonationComment(donationId, newMessage.trim());
       setComments((prev) => [...prev, created]);
       setNewMessage('');
-      showToast('Comment sent successfully', 'success');
+      showSuccess('Comment sent successfully');
     } catch {
-      showToast('Failed to post comment', 'error');
+      showError('Failed to post comment');
     } finally {
       setSubmitting(false);
     }

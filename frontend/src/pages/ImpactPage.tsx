@@ -49,13 +49,13 @@ export const ImpactPage: React.FC = () => {
       {/* Hero Banner */}
       <div className="relative overflow-hidden bg-gradient-to-r from-indigo-950 via-slate-900 to-emerald-950 rounded-2xl border border-indigo-500/20 p-8 mb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 mb-3 inline-block">
+          <span className="text-xs font-bold uppercase tracking-widest bg-emerald-500/20 px-3 py-1.5 rounded-full border border-emerald-400/30 mb-3 inline-block font-semibold" style={{ color: '#34D399' }}>
             🌱 Environmental & Community Impact Report
           </span>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-2" style={{ color: '#FFFFFF' }}>
             DonateConnect Impact Analytics
           </h1>
-          <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+          <p className="text-sm max-w-2xl leading-relaxed font-medium" style={{ color: '#E2E8F0' }}>
             Real-time tracking of community donations, active NGO relief drives, and carbon footprint reduction achieved through item reuse and zero-waste logistics.
           </p>
         </div>

@@ -16,19 +16,52 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getInitialUser = (): User | null => {
+  try {
+    const saved = localStorage.getItem('dc-user');
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('dc-token'));
+  const [user, setUser] = useState<User | null>(() => getInitialUser());
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleLogout = () => {
     setToken(null);
     setUser(null);
+    localStorage.removeItem('dc-token');
+    localStorage.removeItem('dc-user');
     setAuthTokenInMemory(null);
   };
 
   useEffect(() => {
     registerLogoutCallback(handleLogout);
+  }, []);
+
+  // Revalidate session on app startup
+  useEffect(() => {
+    const savedToken = localStorage.getItem('dc-token');
+    if (savedToken) {
+      setAuthTokenInMemory(savedToken);
+      getCurrentUserApi()
+        .then((currentUser) => {
+          setUser(currentUser);
+          localStorage.setItem('dc-user', JSON.stringify(currentUser));
+        })
+        .catch(() => {
+          // If token expired or invalid, clear session
+          handleLogout();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const login = async (data: LoginRequest) => {
@@ -37,6 +70,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const res: AuthResponse = await loginApi(data);
       setToken(res.token);
       setUser(res.user);
+      localStorage.setItem('dc-token', res.token);
+      localStorage.setItem('dc-user', JSON.stringify(res.user));
       setAuthTokenInMemory(res.token);
     } finally {
       setLoading(false);
@@ -49,6 +84,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const res: AuthResponse = await registerDonorApi(data);
       setToken(res.token);
       setUser(res.user);
+      localStorage.setItem('dc-token', res.token);
+      localStorage.setItem('dc-user', JSON.stringify(res.user));
       setAuthTokenInMemory(res.token);
     } finally {
       setLoading(false);
@@ -56,10 +93,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const refetchUser = async () => {
-    if (!token) return;
+    const savedToken = token || localStorage.getItem('dc-token');
+    if (!savedToken) return;
     try {
       const currentUser = await getCurrentUserApi();
       setUser(currentUser);
+      localStorage.setItem('dc-user', JSON.stringify(currentUser));
     } catch {
       handleLogout();
     }

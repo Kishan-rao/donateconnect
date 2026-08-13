@@ -9,13 +9,15 @@ import com.donateconnect.repository.UserRepository;
 import com.donateconnect.service.DonationCommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,12 +30,15 @@ public class DonationCommentController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DonationCommentDto>>> getComments(
+    public ResponseEntity<ApiResponse<Page<DonationCommentDto>>> getComments(
             Authentication authentication,
-            @PathVariable UUID donationId
+            @PathVariable UUID donationId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
     ) {
         UUID userId = getUserIdFromAuth(authentication);
-        List<DonationCommentDto> comments = commentService.getCommentsByDonationId(donationId, userId);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        Page<DonationCommentDto> comments = commentService.getCommentsByDonationId(donationId, userId, pageRequest);
         return ResponseEntity.ok(ApiResponse.success("Fetched donation comments", comments));
     }
 

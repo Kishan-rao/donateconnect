@@ -3,6 +3,7 @@ com\donateconnect\dto\CreateNgoRequest$CreateNgoRequestBuilder.class
 com\donateconnect\entity\NgoUrgentNeed$NgoUrgentNeedBuilder.class
 com\donateconnect\dto\NgoUrgentNeedDto$NgoUrgentNeedDtoBuilder.class
 com\donateconnect\dto\CreateDonationRequest$CreateDonationRequestBuilder.class
+com\donateconnect\service\impl\VolunteerServiceImpl$1.class
 com\donateconnect\entity\BlockchainBlock$BlockchainBlockBuilder.class
 com\donateconnect\entity\NgoUrgentNeed.class
 com\donateconnect\service\impl\DonationCommentServiceImpl.class

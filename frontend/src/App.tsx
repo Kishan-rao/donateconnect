@@ -27,11 +27,11 @@ import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { EmergencySosBanner } from './components/EmergencySosBanner';
 
-export const App: React.FC = () => {
+const AppShell: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+        <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#111827] selection:bg-[#7567E8] selection:text-white">
           <EmergencySosBanner />
           <Navbar />
           <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,8 +53,8 @@ export const App: React.FC = () => {
               <Route element={<ProtectedRoute allowedRoles={['DONOR', 'ADMIN']} />}>
                 <Route path="/donate/new" element={<CreateDonationPage />} />
                 <Route path="/donations/new" element={<Navigate to="/donate/new" replace />} />
-                <Route path="/my-donations" element={<MyDonationsPage />} />
-                <Route path="/donations" element={<Navigate to="/my-donations" replace />} />
+                <Route path="/donations" element={<MyDonationsPage />} />
+                <Route path="/my-donations" element={<Navigate to="/donations" replace />} />
               </Route>
 
               {/* Protected NGO Routes */}
@@ -88,5 +88,7 @@ export const App: React.FC = () => {
     </AuthProvider>
   );
 };
+
+export const App: React.FC = () => <AppShell />;
 
 export default App;

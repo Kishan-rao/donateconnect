@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import { ApiResponse, CreateNgoRequest, CreateRatingRequest, CreateUrgentNeedRequest, ImpactMetrics, NGOProfile, NgoRating, NgoUrgentNeed, UpdateNgoProfileDto } from '../types';
+import { ApiResponse, CreateNgoRequest, CreateRatingRequest, CreateUrgentNeedRequest, ImpactMetrics, NGOProfile, NgoRating, NgoUrgentNeed, PageResponse, UpdateNgoProfileDto } from '../types';
 
 // Public / Donor APIs
 export const getVerifiedNgos = async (): Promise<NGOProfile[]> => {
@@ -24,8 +24,8 @@ export const getActiveUrgentNeeds = async (): Promise<NgoUrgentNeed[]> => {
 };
 
 export const getNgoRatings = async (ngoId: string): Promise<NgoRating[]> => {
-  const response = await apiClient.get<ApiResponse<NgoRating[]>>(`/ngo/${ngoId}/ratings`);
-  return response.data.data;
+  const response = await apiClient.get<ApiResponse<PageResponse<NgoRating>>>(`/ngo/${ngoId}/ratings?page=0&size=100`);
+  return response.data.data.content;
 };
 
 export const addNgoRating = async (ngoId: string, dto: CreateRatingRequest): Promise<NgoRating> => {

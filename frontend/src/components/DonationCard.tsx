@@ -2,6 +2,7 @@ import React from 'react';
 import { Donation, DonationStatus } from '../types';
 import { formatDate, getCategoryBadgeColor } from '../utils/formatters';
 import { Tag, User, Building2 } from 'lucide-react';
+import { getPhotoUrl } from '../utils/photoHelper';
 
 interface DonationCardProps {
   donation: Donation;
@@ -10,8 +11,22 @@ interface DonationCardProps {
 }
 
 export const DonationCard: React.FC<DonationCardProps> = ({ donation, onStatusChange, isNgoView }) => {
+  const getStatusBadgeStyle = (status: DonationStatus) => {
+    switch (status) {
+      case 'ACCEPTED':
+      case 'DELIVERED':
+        return 'bg-[#E6F4EA] text-[#047857] border-[#A7F3D0]';
+      case 'REJECTED':
+        return 'bg-[#FEE2E2] text-[#B91C1C] border-[#FCA5A5]';
+      case 'PICKED_UP':
+      case 'REQUESTED':
+      default:
+        return 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]';
+    }
+  };
+
   return (
-    <div className="group bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/40 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 flex flex-col justify-between">
+    <div className="group bg-white border border-[#E5E7EB] rounded-2xl p-5 hover:bg-[#F4F2FA] hover:border-[#7567E8] transition-all duration-300 shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)] flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-3">
           <span
@@ -22,24 +37,16 @@ export const DonationCard: React.FC<DonationCardProps> = ({ donation, onStatusCh
             <Tag className="w-3 h-3" />
             {donation.category}
           </span>
-          <span
-            className={`text-[11px] font-bold tracking-wider px-2.5 py-0.5 rounded ${
-              donation.status === 'DELIVERED' || donation.status === 'ACCEPTED'
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                : donation.status === 'REJECTED'
-                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-            }`}
-          >
+          <span className={`text-[11px] font-bold tracking-wider px-2.5 py-0.5 rounded border ${getStatusBadgeStyle(donation.status)}`}>
             {donation.status}
           </span>
         </div>
 
-        <h3 className="text-lg font-bold text-white mb-1 group-hover:text-indigo-400 transition-colors">
+        <h3 className="text-lg font-extrabold text-[#111827] mb-1 group-hover:text-[#7567E8] transition-colors">
           {donation.category} Donation Request
         </h3>
 
-        <p className="text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">
+        <p className="text-[#4B5563] text-sm mb-4 line-clamp-3 leading-relaxed">
           {donation.description || 'No detailed description provided.'}
         </p>
 
@@ -48,40 +55,40 @@ export const DonationCard: React.FC<DonationCardProps> = ({ donation, onStatusCh
             {donation.photoUrls.map((url, idx) => (
               <img
                 key={idx}
-                src={url}
+                src={getPhotoUrl(url)}
                 alt="Donation attachment"
-                className="w-14 h-14 object-cover rounded-lg border border-slate-800"
+                className="w-14 h-14 object-cover rounded-lg border border-[#E5E7EB]"
               />
             ))}
           </div>
         )}
       </div>
 
-      <div className="border-t border-slate-800/80 pt-4 mt-2 space-y-3">
+      <div className="border-t border-[#E5E7EB] pt-4 mt-2 space-y-3">
         <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Building2 className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="font-medium">{donation.ngo?.name || 'NGO Partner'}</span>
+          <div className="flex items-center gap-1.5 text-[#111827]">
+            <Building2 className="w-3.5 h-3.5 text-[#7567E8]" />
+            <span className="font-extrabold">{donation.ngo?.name || 'NGO Partner'}</span>
           </div>
 
-          <div className="flex items-center gap-1 text-slate-400">
-            <User className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="flex items-center gap-1 text-[#4B5563]">
+            <User className="w-3.5 h-3.5 text-[#7567E8]" />
             <span>{donation.donor?.fullName}</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-slate-500">
+        <div className="flex items-center justify-between text-[11px] text-[#6B7280]">
           <span>Created: {formatDate(donation.createdAt)}</span>
           {donation.pickupDate && <span>Pickup: {donation.pickupDate}</span>}
         </div>
 
         {isNgoView && onStatusChange && (
           <div className="pt-2 flex items-center gap-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Update Status:</span>
+            <span className="text-[10px] font-bold text-[#4B5563] uppercase">Update Status:</span>
             <select
               value={donation.status}
               onChange={(e) => onStatusChange(donation.id, e.target.value as DonationStatus)}
-              className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-indigo-300 focus:outline-none focus:border-indigo-500"
+              className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-xs text-[#7567E8] font-bold focus:outline-none focus:border-[#7567E8]"
             >
               <option value="REQUESTED">REQUESTED</option>
               <option value="ACCEPTED">ACCEPTED</option>

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
@@ -35,11 +38,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationDto> getUserNotifications(UUID userId) {
-        return notificationRepository.findByRecipientUserIdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<NotificationDto> getUserNotifications(UUID userId, Pageable pageable) {
+        return notificationRepository.findByRecipientUserIdOrderByCreatedAtDesc(userId, pageable)
+                .map(this::mapToDto);
     }
 
     @Override

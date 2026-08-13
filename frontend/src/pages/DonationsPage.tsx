@@ -22,11 +22,11 @@ export const DonationsPage: React.FC = () => {
     setError(null);
     try {
       if (isNgo) {
-        const data = await getNgoAssignedDonations();
-        setDonations(data);
+        const pageResponse = await getNgoAssignedDonations(0, 100);
+        setDonations(pageResponse.content);
       } else {
-        const data = await getMyDonations();
-        setDonations(data);
+        const pageResponse = await getMyDonations(0, 100);
+        setDonations(pageResponse.content);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load donations');

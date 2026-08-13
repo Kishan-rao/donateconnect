@@ -36,7 +36,7 @@ export const AdminOverviewPage: React.FC = () => {
             Admin Overview & Analytics
           </h1>
           <p className="text-slate-400 text-sm mt-1">
-            System-wide statistics aggregated directly via JPA database queries
+            System-wide donation, partner, and fulfillment statistics
           </p>
         </div>
 

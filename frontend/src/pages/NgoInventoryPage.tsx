@@ -12,7 +12,8 @@ export const NgoInventoryPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getNgoAssignedDonations();
+      const pageResponse = await getNgoAssignedDonations(0, 100);
+      const data = pageResponse.content;
       // Filter strictly for DELIVERED items
       setDonations(data.filter((d) => d.status === 'DELIVERED'));
     } catch (err: any) {

@@ -12,12 +12,12 @@ import com.donateconnect.repository.NgoRatingRepository;
 import com.donateconnect.repository.UserRepository;
 import com.donateconnect.service.NgoRatingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +29,9 @@ public class NgoRatingServiceImpl implements NgoRatingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NgoRatingDto> getRatingsByNgoId(UUID ngoId) {
-        return ratingRepository.findByNgoIdOrderByCreatedAtDesc(ngoId).stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<NgoRatingDto> getRatingsByNgoId(UUID ngoId, Pageable pageable) {
+        return ratingRepository.findByNgoIdOrderByCreatedAtDesc(ngoId, pageable)
+                .map(this::mapToDto);
     }
 
     @Override

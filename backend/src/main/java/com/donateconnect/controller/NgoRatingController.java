@@ -9,13 +9,15 @@ import com.donateconnect.repository.UserRepository;
 import com.donateconnect.service.NgoRatingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,8 +29,13 @@ public class NgoRatingController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<NgoRatingDto>>> getRatings(@PathVariable UUID ngoId) {
-        List<NgoRatingDto> ratings = ratingService.getRatingsByNgoId(ngoId);
+    public ResponseEntity<ApiResponse<Page<NgoRatingDto>>> getRatings(
+            @PathVariable UUID ngoId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<NgoRatingDto> ratings = ratingService.getRatingsByNgoId(ngoId, pageRequest);
         return ResponseEntity.ok(ApiResponse.success("Fetched NGO ratings and reviews", ratings));
     }
 

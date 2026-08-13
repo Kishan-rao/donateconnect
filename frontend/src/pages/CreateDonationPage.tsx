@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { createDonation } from '../api/donationApi';
+import { createDonation, uploadDonationPhoto } from '../api/donationApi';
 import { getVerifiedNgos } from '../api/ngoApi';
 import { CreateDonationRequest, NGOProfile } from '../types';
-import { HeartHandshake, ArrowLeft, Send, Building2, UploadCloud, X } from 'lucide-react';
+import { HeartHandshake, ArrowLeft, Send, Building2, UploadCloud, X, Loader2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+
+const ACCEPTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_PHOTOS = 5;
+
+const getTodayInputValue = () => {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().split('T')[0];
+};
+
+interface UploadedPhoto {
+  previewUrl: string; // local object URL for preview
+  serverUrl: string;  // URL returned by backend storage endpoint
+}
 
 export const CreateDonationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +32,10 @@ export const CreateDonationPage: React.FC = () => {
   const [loadingNgos, setLoadingNgos] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const todayInputValue = getTodayInputValue();
 
   const {
     register,
@@ -43,36 +61,87 @@ export const CreateDonationPage: React.FC = () => {
       .finally(() => setLoadingNgos(false));
   }, [preselectedNgoId, setValue]);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setPhotos((prev) => [...prev, event.target!.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    setPhotoError(null);
+    const incomingFiles = Array.from(files);
+    const remainingSlots = MAX_PHOTOS - photos.length;
+
+    if (remainingSlots <= 0) {
+      setPhotoError(`You can upload up to ${MAX_PHOTOS} photos.`);
+      e.target.value = '';
+      return;
+    }
+
+    const validFiles: File[] = [];
+
+    for (const file of incomingFiles.slice(0, remainingSlots)) {
+      if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+        setPhotoError('Photos must be PNG, JPG, or WEBP images.');
+        continue;
+      }
+      if (file.size > MAX_PHOTO_SIZE_BYTES) {
+        setPhotoError('Each photo must be 10 MB or smaller.');
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (incomingFiles.length > remainingSlots) {
+      setPhotoError(`Only ${remainingSlots} more photo${remainingSlots === 1 ? '' : 's'} can be added.`);
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingPhotos(true);
+    const uploaded: UploadedPhoto[] = [];
+
+    for (const file of validFiles) {
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        const serverUrl = await uploadDonationPhoto(file);
+        uploaded.push({ previewUrl, serverUrl });
+      } catch (err: any) {
+        setPhotoError(err.message || 'Failed to upload one or more photos.');
+      }
+    }
+
+    setPhotos((prev) => [...prev, ...uploaded]);
+    setUploadingPhotos(false);
+    e.target.value = '';
   };
 
   const removePhoto = (index: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotos((prev) => {
+      const removed = prev[index];
+      if (removed) URL.revokeObjectURL(removed.previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
+    setPhotoError(null);
   };
 
   const onSubmit = async (data: CreateDonationRequest) => {
+    if (photos.length === 0) {
+      setPhotoError('Please upload at least one clear photo of the items.');
+      return;
+    }
+
     setSubmitting(true);
     setServerError(null);
+    setPhotoError(null);
     try {
       await createDonation({
         ...data,
-        photoUrls: photos,
+        description: data.description?.trim(),
+        photoUrls: photos.map((p) => p.serverUrl),
       });
       showSuccess('Donation request submitted successfully!');
-      navigate('/my-donations');
+      navigate('/donations');
     } catch (err: any) {
       const msg = err.message || 'Failed to submit donation.';
       setServerError(msg);
@@ -169,52 +238,85 @@ export const CreateDonationPage: React.FC = () => {
               </label>
               <input
                 type="date"
-                {...register('pickupDate')}
+                min={todayInputValue}
+                {...register('pickupDate', {
+                  required: 'Preferred pickup date is required',
+                  validate: (value) =>
+                    !value || value >= todayInputValue || 'Pickup date cannot be in the past',
+                })}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
               />
+              {errors.pickupDate && (
+                <p className="text-rose-400 text-xs mt-1">{errors.pickupDate.message}</p>
+              )}
             </div>
           </div>
 
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Item Description & Condition
+              Item Description & Condition *
             </label>
             <textarea
               rows={4}
               placeholder="Describe the items being donated (e.g. 5 winter jackets in good condition, sizes M and L)..."
-              {...register('description')}
+              {...register('description', {
+                required: 'Item description is required',
+                validate: (value) => {
+                  const trimmed = value?.trim() || '';
+                  if (trimmed.length < 20) {
+                    return 'Description must be at least 20 characters';
+                  }
+                  if (trimmed.length > 2000) {
+                    return 'Description must be 2000 characters or fewer';
+                  }
+                  return true;
+                },
+              })}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
             />
+            {errors.description && (
+              <p className="text-rose-400 text-xs mt-1">{errors.description.message}</p>
+            )}
           </div>
 
           {/* Photo Upload Section */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-              Item Photos (Optional)
+              Item Photos *
             </label>
             <div className="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 rounded-2xl p-6 text-center transition-colors bg-slate-950/40">
               <input
                 type="file"
                 id="photo-upload"
                 multiple
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp"
                 onChange={handlePhotoUpload}
+                disabled={uploadingPhotos}
                 className="hidden"
               />
               <label htmlFor="photo-upload" className="cursor-pointer flex flex-col items-center justify-center gap-2">
                 <UploadCloud className="w-8 h-8 text-indigo-400" />
                 <span className="text-xs text-slate-300 font-medium">Click to upload photo attachments</span>
-                <span className="text-[10px] text-slate-500">Supports PNG, JPG, WEBP (stored in request)</span>
+                <span className="text-[10px] text-slate-500">PNG, JPG, WEBP only. Up to {MAX_PHOTOS} photos, 10 MB each.</span>
               </label>
             </div>
+            {photoError && <p className="text-rose-400 text-xs mt-1">{photoError}</p>}
+
+            {/* Upload Progress Indicator */}
+            {uploadingPhotos && (
+              <div className="flex items-center gap-2 text-xs text-indigo-300 mt-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                Uploading photo to server...
+              </div>
+            )}
 
             {/* Photo Previews */}
             {photos.length > 0 && (
               <div className="flex flex-wrap gap-3 mt-4">
-                {photos.map((src, idx) => (
+                {photos.map((photo, idx) => (
                   <div key={idx} className="relative group w-20 h-20 rounded-xl overflow-hidden border border-slate-700">
-                    <img src={src} alt="Upload preview" className="w-full h-full object-cover" />
+                    <img src={photo.previewUrl} alt="Upload preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removePhoto(idx)}
@@ -231,13 +333,18 @@ export const CreateDonationPage: React.FC = () => {
           <div className="pt-2">
             <button
               type="submit"
-              disabled={submitting || ngos.length === 0}
+              disabled={submitting || uploadingPhotos || ngos.length === 0}
               className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-rose-600 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 hover:scale-[1.01] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Submitting Request...
+                </>
+              ) : uploadingPhotos ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Uploading Photos...
                 </>
               ) : (
                 <>

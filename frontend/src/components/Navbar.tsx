@@ -1,15 +1,32 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { HeartHandshake, PlusCircle, Home, LogIn, UserPlus, LogOut, Shield, Building2, PackageCheck, Layers, UserCheck, LayoutDashboard, BarChart3, MapPin, Truck, Lock, Cpu, Recycle, Mic } from 'lucide-react';
+import {
+  HeartHandshake,
+  Home,
+  LogIn,
+  UserPlus,
+  Shield,
+  Building2,
+  BarChart3,
+  MapPin,
+  Truck,
+  Lock,
+  Cpu,
+  Recycle,
+  Mic,
+  ChevronDown,
+} from 'lucide-react';
 import { HealthBadge } from './HealthBadge';
 import { NotificationBell } from './NotificationBell';
 import { VoiceAssistantModal } from './VoiceAssistantModal';
+import { ProfileDropdown } from './ProfileDropdown';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [showVoiceModal, setShowVoiceModal] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
   const isNgo = user?.role === 'NGO';
@@ -17,100 +34,75 @@ export const Navbar: React.FC = () => {
   const isVolunteer = user?.role === 'VOLUNTEER';
   const isCorporate = user?.role === 'CORPORATE';
 
+  const navLinkClass = (path: string) =>
+    `flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+      isActive(path)
+        ? 'bg-[#7567E8] text-white shadow-sm font-bold'
+        : 'text-[#4B5563] hover:text-[#111827] hover:bg-[#F4F2FA]'
+    }`;
+
   return (
     <>
-      <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+      <header className="sticky top-0 z-50 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#E5E7EB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between gap-6 h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-rose-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
+              <div className="w-10 h-10 rounded-xl bg-[#7567E8] flex items-center justify-center shadow-md shadow-[#7567E8]/20 group-hover:scale-105 transition-transform duration-200">
                 <HeartHandshake className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="text-xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                <span className="text-xl font-extrabold text-[#111827]">
                   DonateConnect
                 </span>
-                <span className="block text-[10px] uppercase tracking-wider font-semibold text-indigo-400 -mt-1">
-                  {isAdmin ? 'Admin Console' : isNgo ? 'NGO Portal' : isVolunteer ? 'Driver Console' : isCorporate ? 'CSR Console' : 'Platform'}
+                <span className="block text-[10px] uppercase tracking-wider font-bold text-[#7567E8] -mt-1">
+                  {isAdmin
+                    ? 'Admin Console'
+                    : isNgo
+                    ? 'NGO Portal'
+                    : isVolunteer
+                    ? 'Driver Console'
+                    : isCorporate
+                    ? 'CSR Console'
+                    : 'Platform'}
                 </span>
               </div>
             </Link>
 
             {/* Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 bg-slate-800/40 p-1.5 rounded-full border border-slate-800">
-              <Link
-                to="/"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isActive('/') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
+            <nav className="hidden lg:flex items-center gap-1 bg-[#F9FAFB] p-1.5 rounded-full border border-[#E5E7EB]">
+              <Link to="/" className={navLinkClass('/')}>
                 <Home className="w-3.5 h-3.5" /> Home
               </Link>
 
-              <Link
-                to="/map"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isActive('/map') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
+              <Link to="/map" className={navLinkClass('/map')}>
                 <MapPin className="w-3.5 h-3.5" /> Map
               </Link>
 
-              <Link
-                to="/lockers"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isActive('/lockers') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
+              <Link to="/lockers" className={navLinkClass('/lockers')}>
                 <Lock className="w-3.5 h-3.5" /> Lockers
               </Link>
 
-              <Link
-                to="/impact"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isActive('/impact') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
+              <Link to="/impact" className={navLinkClass('/impact')}>
                 <BarChart3 className="w-3.5 h-3.5" /> Impact
               </Link>
 
-              <Link
-                to="/blockchain-ledger"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isActive('/blockchain-ledger') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
+              <Link to="/blockchain-ledger" className={navLinkClass('/blockchain-ledger')}>
                 <Cpu className="w-3.5 h-3.5" /> Blockchain
               </Link>
 
-              <Link
-                to="/circular-market"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isActive('/circular-market') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
+              <Link to="/circular-market" className={navLinkClass('/circular-market')}>
                 <Recycle className="w-3.5 h-3.5" /> Circular
               </Link>
 
               {isVolunteer && (
-                <Link
-                  to="/driver-dashboard"
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    isActive('/driver-dashboard') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                >
+                <Link to="/driver-dashboard" className={navLinkClass('/driver-dashboard')}>
                   <Truck className="w-3.5 h-3.5" /> Driver
                 </Link>
               )}
 
               {isCorporate && (
-                <Link
-                  to="/csr-dashboard"
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    isActive('/csr-dashboard') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                >
+                <Link to="/csr-dashboard" className={navLinkClass('/csr-dashboard')}>
                   <Building2 className="w-3.5 h-3.5" /> CSR
                 </Link>
               )}
@@ -121,7 +113,7 @@ export const Navbar: React.FC = () => {
               <button
                 onClick={() => setShowVoiceModal(true)}
                 title="Voice AI Booking Assistant"
-                className="p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 transition-colors"
+                className="p-2 rounded-xl bg-[#7567E8]/10 hover:bg-[#7567E8]/20 text-[#7567E8] border border-[#7567E8]/20 transition-colors"
               >
                 <Mic className="w-4 h-4" />
               </button>
@@ -129,48 +121,61 @@ export const Navbar: React.FC = () => {
               {isAuthenticated && <NotificationBell />}
               <HealthBadge />
 
+              {/* Divider */}
+              <div className="w-px h-5 bg-[#E5E7EB] shrink-0" />
+
               {isAuthenticated && user ? (
-                <div className="flex items-center gap-3 pl-2 border-l border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold text-xs">
-                      {user.fullName.charAt(0).toUpperCase()}
+                <div className="relative">
+                  {/* Profile trigger button */}
+                  <button
+                    onClick={() => setProfileOpen((prev) => !prev)}
+                    aria-haspopup="true"
+                    aria-expanded={profileOpen}
+                    title="Account menu"
+                    className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 hover:bg-[#F4F2FA] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7567E8]"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#7567E8] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">
+                      {(user.fullName ? user.fullName : user.email).charAt(0).toUpperCase()}
                     </div>
                     <div className="hidden sm:block text-left">
-                      <span className="block text-xs font-semibold text-white leading-tight">
+                      <span className="block text-xs font-bold text-[#111827] leading-tight">
                         {user.fullName}
                       </span>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-400 uppercase tracking-wider">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#7567E8] uppercase tracking-wider">
                         <Shield className="w-2.5 h-2.5" />
                         {user.role}
                       </span>
                     </div>
-                  </div>
-
-                  <button
-                    onClick={logout}
-                    title="Sign Out"
-                    className="p-2 rounded-xl bg-slate-800/80 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition-colors border border-slate-700/60"
-                  >
-                    <LogOut className="w-4 h-4" />
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-[#4B5563] transition-transform duration-150 ${
+                        profileOpen ? 'rotate-180' : ''
+                      }`}
+                    />
                   </button>
+
+                  {/* Profile Dropdown */}
+                  <ProfileDropdown
+                    isOpen={profileOpen}
+                    onClose={() => setProfileOpen(false)}
+                  />
                 </div>
               ) : (
-                <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
+                <>
                   <Link
                     to="/login"
-                    className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition-colors border border-slate-700 flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-[#F9FAFB] text-[#111827] font-semibold text-xs transition-colors border border-[#E5E7EB] flex items-center gap-1.5 shadow-sm"
                   >
-                    <LogIn className="w-3.5 h-3.5 text-slate-400" />
+                    <LogIn className="w-3.5 h-3.5 text-[#4B5563]" />
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-md shadow-indigo-600/20"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
                     Register
                   </Link>
-                </div>
+                </>
               )}
             </div>
           </div>

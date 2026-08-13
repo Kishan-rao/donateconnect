@@ -1,8 +1,15 @@
 import { apiClient } from './client';
-import { ApiResponse, VolunteerTask } from '../types';
+import { ApiResponse, Donation, PageResponse, VolunteerTask } from '../types';
 
 export const getMyVolunteerTasks = async (): Promise<VolunteerTask[]> => {
   const response = await apiClient.get<ApiResponse<VolunteerTask[]>>('/volunteer/pickups');
+  return response.data.data;
+};
+
+export const getAvailablePickups = async (page = 0, size = 20): Promise<PageResponse<Donation>> => {
+  const response = await apiClient.get<ApiResponse<PageResponse<Donation>>>(
+    `/volunteer/pickups/available?page=${page}&size=${size}`
+  );
   return response.data.data;
 };
 

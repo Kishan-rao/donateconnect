@@ -19,14 +19,32 @@ export const createDonation = async (dto: CreateDonationRequest): Promise<Donati
   return response.data.data;
 };
 
-export const getMyDonations = async (): Promise<Donation[]> => {
-  const response = await apiClient.get<ApiResponse<Donation[]>>('/donations/mine');
+export const getMyDonations = async (page = 0, size = 10): Promise<PageResponse<Donation>> => {
+  const response = await apiClient.get<ApiResponse<PageResponse<Donation>>>(`/donations/mine?page=${page}&size=${size}`);
   return response.data.data;
 };
 
+export const getDonationById = async (id: string): Promise<Donation> => {
+  const response = await apiClient.get<ApiResponse<Donation>>(`/donations/mine/${id}`);
+  return response.data.data;
+};
+
+/**
+ * Upload a single donation photo file to the local storage backend.
+ * Returns the relative URL path (e.g. "/api/donations/photo/uuid.jpg") to store in photoUrls.
+ */
+export const uploadDonationPhoto = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await apiClient.post<ApiResponse<{ url: string }>>('/donations/photo', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data.data.url;
+};
+
 // NGO Role APIs
-export const getNgoAssignedDonations = async (): Promise<Donation[]> => {
-  const response = await apiClient.get<ApiResponse<Donation[]>>('/ngo/donations');
+export const getNgoAssignedDonations = async (page = 0, size = 100): Promise<PageResponse<Donation>> => {
+  const response = await apiClient.get<ApiResponse<PageResponse<Donation>>>(`/ngo/donations?page=${page}&size=${size}`);
   return response.data.data;
 };
 
@@ -36,8 +54,8 @@ export const updateDonationStatusByNgo = async (id: string, status: DonationStat
 };
 
 // Donation Comments (Direct Messaging)
-export const getDonationComments = async (donationId: string): Promise<DonationComment[]> => {
-  const response = await apiClient.get<ApiResponse<DonationComment[]>>(`/donations/${donationId}/comments`);
+export const getDonationComments = async (donationId: string, page = 0, size = 100): Promise<PageResponse<DonationComment>> => {
+  const response = await apiClient.get<ApiResponse<PageResponse<DonationComment>>>(`/donations/${donationId}/comments?page=${page}&size=${size}`);
   return response.data.data;
 };
 

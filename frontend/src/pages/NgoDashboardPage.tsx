@@ -3,6 +3,7 @@ import { getNgoAssignedDonations, updateDonationStatusByNgo } from '../api/donat
 import { Donation, DonationStatus } from '../types';
 import { formatDate } from '../utils/formatters';
 import { LiveDriverTrackerModal } from '../components/LiveDriverTrackerModal';
+import { getPhotoUrl } from '../utils/photoHelper';
 import {
   Building2,
   RefreshCw,
@@ -33,9 +34,10 @@ export const NgoDashboardPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getNgoAssignedDonations();
+      const pageResponse = await getNgoAssignedDonations(0, 100);
+      const data = pageResponse.content;
       // Sort newest first
-      const sorted = data.sort(
+      const sorted = [...data].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setDonations(sorted);
@@ -207,12 +209,12 @@ export const NgoDashboardPage: React.FC = () => {
                   {donation.description || 'No item description provided.'}
                 </p>
 
-                {donation.photoUrls && donation.photoUrls.length > 0 && (
+                 {donation.photoUrls && donation.photoUrls.length > 0 && (
                   <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
                     {donation.photoUrls.map((url, idx) => (
                       <img
                         key={idx}
-                        src={url}
+                        src={getPhotoUrl(url)}
                         alt="Donation attachment"
                         className="w-14 h-14 object-cover rounded-lg border border-slate-800"
                       />
