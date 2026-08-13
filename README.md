@@ -109,34 +109,6 @@ docker run -p 8080:8080 \
 
 ---
 
-## 🚀 Cloud Deployment Guide
-
-### Backend Deployment (Render.com)
-
-1. **Create PostgreSQL Database on Render**:
-   - Go to [Render Dashboard](https://dashboard.render.com/) &rarr; **New +** &rarr; **PostgreSQL**.
-
-2. **Deploy Spring Boot Web Service**:
-   - Select **New +** &rarr; **Web Service**.
-   - Connect your GitHub Repository containing `backend/`.
-   - Set Environment to **Docker** and Root Directory to `backend`.
-   - Set environment variables (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`).
-   - Click **Deploy Web Service**.
-
----
-
-### Frontend Deployment (Vercel)
-
-1. **Deploy to Vercel**:
-   - Go to [Vercel Dashboard](https://vercel.com/) &rarr; **Add New Project**.
-   - Set Root Directory to `frontend`.
-   - Framework Preset = `Vite`.
-   - Environment Variable: `VITE_API_BASE_URL` = `https://<your-render-backend-url>.onrender.com/api`.
-
-2. **SPA Routing**:
-   The included `vercel.json` handles client-side React Router rewrites (`/(.*)` &rarr; `/index.html`).
-
----
 
 ## 🔒 API & Endpoint Reference
 
