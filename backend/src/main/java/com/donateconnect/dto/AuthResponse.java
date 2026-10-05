@@ -12,4 +12,7 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
     private String token;
     private UserResponseDto user;
+    
+    @Builder.Default
+    private boolean requiresOtp = false;
 }

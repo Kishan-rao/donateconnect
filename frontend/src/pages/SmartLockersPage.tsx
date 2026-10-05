@@ -13,7 +13,7 @@ export const SmartLockersPage: React.FC = () => {
     getSmartLockers()
       .then((data) => {
         setLockers(data);
-        if (data.length > 0) setSelectedLocker(data[0]);
+        if (Array.isArray(data) && data.length > 0) setSelectedLocker(data[0]);
       })
       .catch(() => setLockers([]))
       .finally(() => setLoading(false));

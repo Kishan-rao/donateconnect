@@ -54,22 +54,30 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isOpen, onClos
     navigate('/');
   };
 
+  const getProfilePath = () => {
+    switch (user?.role) {
+      case 'ADMIN': return '/admin/profile';
+      case 'NGO': return '/ngo-dashboard/profile';
+      default: return '/donor/profile';
+    }
+  };
+
   const handleNavigation = (path: string) => {
     onClose();
     navigate(path);
   };
 
   const menuItemClass =
-    'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-[#4B5563] hover:bg-[#F4F2FA] hover:text-[#111827] transition-colors';
+    'flex items-center gap-3 w-full px-3.5 py-3 rounded-lg text-sm font-medium text-[#4B5563] hover:bg-[#F4F2FA] hover:text-[#111827] transition-colors min-h-[44px]';
 
-  const iconClass = 'w-4 h-4 text-[#6B7280]';
+  const iconClass = 'w-4 h-4 text-[#6B7280] shrink-0';
 
   return (
     <div
       ref={dropdownRef}
       role="menu"
       aria-label="User menu"
-      className="absolute top-full right-0 mt-2 w-56 rounded-2xl shadow-xl bg-white border border-[#E5E7EB] z-50 overflow-hidden"
+      className="absolute top-full right-0 mt-2 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl shadow-xl bg-white border border-[#E5E7EB] z-50 overflow-hidden"
     >
       {/* Header — user identity */}
       <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#E5E7EB] bg-[#F9FAFB]">
@@ -109,7 +117,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isOpen, onClos
 
         <button
           role="menuitem"
-          onClick={() => handleNavigation('/')}
+          onClick={() => handleNavigation(getProfilePath())}
           className={menuItemClass}
         >
           <User className={iconClass} />
@@ -131,9 +139,9 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isOpen, onClos
         <button
           role="menuitem"
           onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-[#DC2626] hover:bg-[#FEE2E2] transition-colors font-bold"
+          className="flex items-center gap-3 w-full px-3.5 py-3 rounded-lg text-sm text-[#DC2626] hover:bg-[#FEE2E2] transition-colors font-bold min-h-[44px]"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-4 h-4 shrink-0" />
           Sign Out
         </button>
       </div>

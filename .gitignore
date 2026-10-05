@@ -48,3 +48,10 @@ backend/uploads/
 backend/target/
 frontend/dist/
 frontend/node_modules/
+
+# Android / Capacitor generated files
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+*.apk
+*.aab

@@ -19,14 +19,28 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse authResponse = authService.register(request);
+        if (authResponse.isRequiresOtp()) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(ApiResponse.success("Registration successful. OTP sent to email. Please verify.", authResponse));
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Donor account registered successfully", authResponse));
+                .body(ApiResponse.success("User registered successfully", authResponse));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse authResponse = authService.login(request);
+        if (authResponse.isRequiresOtp()) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(ApiResponse.success("OTP sent to email. Please verify.", authResponse));
+        }
         return ResponseEntity.ok(ApiResponse.success("Logged in successfully", authResponse));
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<AuthResponse>> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        AuthResponse authResponse = authService.verifyOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("OTP verified successfully", authResponse));
     }
 
     @GetMapping("/me")

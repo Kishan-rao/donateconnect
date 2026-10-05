@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000,https://localhost}")
     private String corsAllowedOrigins;
 
     @Bean
@@ -81,8 +81,8 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/health").permitAll()
-                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers("/api/health", "/api/dev-approve-all", "/api/debug-smtp").permitAll()
+                .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/verify-otp").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ngo", "/api/ngo/*", "/api/ngo/*/ratings").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/urgent-needs", "/api/impact").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/lockers", "/api/blockchain", "/api/trades", "/api/sos").permitAll()

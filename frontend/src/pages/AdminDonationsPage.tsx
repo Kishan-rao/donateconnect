@@ -165,7 +165,7 @@ export const AdminDonationsPage: React.FC = () => {
             Retry Connection
           </button>
         </div>
-      ) : !pageData || pageData.content.length === 0 ? (
+      ) : !pageData || !Array.isArray(pageData.content) || pageData.content.length === 0 ? (
         <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 space-y-3">
           <PackageCheck className="w-12 h-12 text-slate-600 mx-auto" />
           <h3 className="text-slate-300 font-semibold text-lg">No audit records match your filters</h3>

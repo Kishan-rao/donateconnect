@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAdminStats } from '../api/adminApi';
-import { AdminStats } from '../types';
-import { Shield, Building2, PackageCheck, Clock, CheckCircle2, RefreshCw, ArrowRight, Layers } from 'lucide-react';
+import { getAdminStats, getPendingUsers, approveUser } from '../api/adminApi';
+import { AdminStats, User } from '../types';
+import { Shield, Building2, PackageCheck, Clock, CheckCircle2, RefreshCw, ArrowRight, Layers, UserCheck } from 'lucide-react';
 
 export const AdminOverviewPage: React.FC = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [pendingUsers, setPendingUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getAdminStats();
-      setStats(data);
+      const [statsData, pendingData] = await Promise.all([
+        getAdminStats(),
+        getPendingUsers()
+      ]);
+      setStats(statsData);
+      setPendingUsers(pendingData);
     } catch (err: any) {
       setError(err.message || 'Failed to load admin statistics.');
     } finally {
@@ -22,8 +28,20 @@ export const AdminOverviewPage: React.FC = () => {
     }
   };
 
+  const handleApprove = async (userId: string) => {
+    setActionLoading(userId);
+    try {
+      await approveUser(userId);
+      setPendingUsers(pendingUsers.filter(u => u.id !== userId));
+    } catch (err: any) {
+      alert(err.message || 'Failed to approve user');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   useEffect(() => {
-    fetchStats();
+    fetchData();
   }, []);
 
   return (
@@ -41,7 +59,7 @@ export const AdminOverviewPage: React.FC = () => {
         </div>
 
         <button
-          onClick={fetchStats}
+          onClick={fetchData}
           disabled={loading}
           className="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors border border-slate-700 flex items-center gap-2 text-xs font-semibold self-start md:self-auto"
         >
@@ -61,7 +79,7 @@ export const AdminOverviewPage: React.FC = () => {
         <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center text-rose-400 space-y-3">
           <p className="font-semibold">{error}</p>
           <button
-            onClick={fetchStats}
+            onClick={fetchData}
             className="px-4 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-semibold transition-colors"
           >
             Retry Connection
@@ -160,6 +178,58 @@ export const AdminOverviewPage: React.FC = () => {
           </div>
           <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0 ml-4" />
         </Link>
+      </div>
+
+      {/* Pending Approvals Section */}
+      <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 md:p-8 mt-8 shadow-xl">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <UserCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Pending User Approvals</h2>
+            <p className="text-sm text-slate-400">Approve new Donors, NGOs, and Delivery drivers.</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="h-24 bg-slate-800/50 rounded-xl animate-pulse" />
+        ) : pendingUsers.length === 0 ? (
+          <div className="text-center py-12 bg-slate-950/50 rounded-2xl border border-slate-800/50">
+            <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3 opacity-50" />
+            <p className="text-slate-400 font-medium">No pending approvals.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {pendingUsers.map(user => (
+              <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-950/50 border border-slate-800/50 hover:border-slate-700 transition-colors">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-white">{user.fullName}</h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-slate-800 text-slate-300">
+                      {user.role}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400">{user.email} • Joined {new Date(user.createdAt).toLocaleDateString()}</p>
+                </div>
+                <button
+                  onClick={() => handleApprove(user.id)}
+                  disabled={actionLoading === user.id}
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 min-w-[120px]"
+                >
+                  {actionLoading === user.id ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      Approve
+                    </>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

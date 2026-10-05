@@ -87,7 +87,7 @@ export const NotificationBell: React.FC = () => {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl transition-colors border flex items-center justify-center bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
+        className="relative w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl transition-colors border flex items-center justify-center bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
         title="Notifications"
       >
         <Bell className="w-4 h-4" />
@@ -100,7 +100,7 @@ export const NotificationBell: React.FC = () => {
 
       {/* Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 sm:w-96 border rounded-2xl shadow-xl z-50 overflow-hidden space-y-1 bg-white border-[#E5E7EB]">
+        <div className="absolute right-0 mt-3 w-80 sm:w-96 max-w-[calc(100vw-1.5rem)] border rounded-2xl shadow-xl z-50 overflow-hidden space-y-1 bg-white border-[#E5E7EB]">
           {/* Dropdown Header */}
           <div className="p-4 border-b flex items-center justify-between bg-[#F9FAFB] border-[#E5E7EB]">
             <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export const NotificationBell: React.FC = () => {
               <button
                 onClick={handleMarkAllRead}
                 disabled={loading}
-                className="text-[11px] font-semibold text-[#7567E8] hover:text-[#7567E8]/80 transition-colors flex items-center gap-1"
+                className="text-[11px] font-semibold text-[#7567E8] hover:text-[#7567E8]/80 transition-colors flex items-center gap-1 min-h-[36px] px-2"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 Mark all read
@@ -139,7 +139,7 @@ export const NotificationBell: React.FC = () => {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-3.5 text-left transition-colors cursor-pointer flex items-start gap-3 ${
+                  className={`p-3.5 text-left transition-colors cursor-pointer flex items-start gap-3 min-h-[44px] ${
                     notification.read
                       ? 'bg-white hover:bg-[#F4F2FA]'
                       : 'bg-[#7567E8]/5 hover:bg-[#7567E8]/10 border-l-2 border-[#7567E8]'

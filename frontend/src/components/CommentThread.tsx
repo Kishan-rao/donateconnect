@@ -18,7 +18,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({ donationId, curren
   const fetchComments = async () => {
     try {
       const pageResponse = await getDonationComments(donationId, 0, 100);
-      setComments(pageResponse.content);
+      setComments(Array.isArray(pageResponse?.content) ? pageResponse.content : []);
     } catch {
       // Ignore if unauthenticated
     } finally {

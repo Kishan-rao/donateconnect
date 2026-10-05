@@ -3,7 +3,10 @@ import { ApiResponse, Donation, PageResponse, VolunteerTask } from '../types';
 
 export const getMyVolunteerTasks = async (): Promise<VolunteerTask[]> => {
   const response = await apiClient.get<ApiResponse<VolunteerTask[]>>('/volunteer/pickups');
-  return response.data.data;
+  // The backend wraps the list in ApiResponse.data; if no tasks exist some
+  // implementations return null for the data field instead of an empty list.
+  // Always return an array so callers can safely access .length without checks.
+  return Array.isArray(response.data.data) ? response.data.data : [];
 };
 
 export const getAvailablePickups = async (page = 0, size = 20): Promise<PageResponse<Donation>> => {

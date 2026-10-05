@@ -198,7 +198,7 @@ export const DriverDashboardPage: React.FC = () => {
             <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 text-slate-400 text-sm">
               Loading available pickups...
             </div>
-          ) : !available || available.content.length === 0 ? (
+          ) : !available || !Array.isArray(available.content) || available.content.length === 0 ? (
             <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 space-y-3">
               <PackageSearch className="w-12 h-12 text-slate-600 mx-auto" />
               <h3 className="text-slate-300 font-semibold text-base">No available pickups right now</h3>

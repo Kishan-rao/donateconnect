@@ -21,8 +21,10 @@ import { NgoProfilePage } from './pages/NgoProfilePage';
 import { AdminOverviewPage } from './pages/AdminOverviewPage';
 import { AdminNgosPage } from './pages/AdminNgosPage';
 import { AdminDonationsPage } from './pages/AdminDonationsPage';
+import { AdminProfilePage } from './pages/AdminProfilePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { DonorProfilePage } from './pages/DonorProfilePage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { EmergencySosBanner } from './components/EmergencySosBanner';
@@ -34,7 +36,7 @@ const AppShell: React.FC = () => {
         <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#111827] selection:bg-[#7567E8] selection:text-white">
           <EmergencySosBanner />
           <Navbar />
-          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:pb-0">
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
@@ -51,6 +53,7 @@ const AppShell: React.FC = () => {
 
               {/* Protected Donor Routes */}
               <Route element={<ProtectedRoute allowedRoles={['DONOR', 'ADMIN']} />}>
+                <Route path="/donor/profile" element={<DonorProfilePage />} />
                 <Route path="/donate/new" element={<CreateDonationPage />} />
                 <Route path="/donations/new" element={<Navigate to="/donate/new" replace />} />
                 <Route path="/donations" element={<MyDonationsPage />} />
@@ -77,6 +80,7 @@ const AppShell: React.FC = () => {
               {/* Protected Admin Routes */}
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route path="/admin" element={<AdminOverviewPage />} />
+                <Route path="/admin/profile" element={<AdminProfilePage />} />
                 <Route path="/admin/ngos" element={<AdminNgosPage />} />
                 <Route path="/admin/donations" element={<AdminDonationsPage />} />
               </Route>

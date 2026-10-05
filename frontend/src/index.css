@@ -62,6 +62,14 @@ body {
   background: #9CA3AF;
 }
 
+/* Safe area padding utilities for mobile & Capacitor Android */
+.safe-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+.safe-pt {
+  padding-top: max(0px, env(safe-area-inset-top, 0px));
+}
+
 /* Automatic overrides for legacy dark slate classes to enforce Warm Organic light theme */
 .bg-slate-950,
 .bg-slate-950\/90,

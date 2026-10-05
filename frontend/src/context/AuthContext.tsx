@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AuthResponse, LoginRequest, RegisterRequest, User } from '../types';
-import { loginApi, registerDonorApi, getCurrentUserApi } from '../api/authApi';
+import { AuthResponse, LoginRequest, RegisterRequest, User, VerifyOtpRequest } from '../types';
+import { loginApi, registerDonorApi, getCurrentUserApi, verifyOtpApi } from '../api/authApi';
 import { setAuthTokenInMemory, registerLogoutCallback } from '../api/client';
 
 interface AuthContextType {
@@ -8,8 +8,9 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (data: LoginRequest) => Promise<void>;
-  registerDonor: (data: RegisterRequest) => Promise<void>;
+  login: (data: LoginRequest) => Promise<AuthResponse>;
+  verifyOtp: (data: VerifyOtpRequest) => Promise<User>;
+  registerDonor: (data: RegisterRequest) => Promise<AuthResponse>;
   logout: () => void;
   refetchUser: () => Promise<void>;
 }
@@ -64,29 +65,52 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const login = async (data: LoginRequest) => {
+  const login = async (data: LoginRequest): Promise<AuthResponse> => {
     setLoading(true);
     try {
       const res: AuthResponse = await loginApi(data);
-      setToken(res.token);
-      setUser(res.user);
-      localStorage.setItem('dc-token', res.token);
-      localStorage.setItem('dc-user', JSON.stringify(res.user));
-      setAuthTokenInMemory(res.token);
+      if (res && !res.requiresOtp && res.token) {
+        setToken(res.token);
+        setUser(res.user);
+        localStorage.setItem('dc-token', res.token);
+        localStorage.setItem('dc-user', JSON.stringify(res.user));
+        setAuthTokenInMemory(res.token);
+      }
+      return res;
     } finally {
       setLoading(false);
     }
   };
 
-  const registerDonor = async (data: RegisterRequest) => {
+  const verifyOtp = async (data: VerifyOtpRequest): Promise<User> => {
+    setLoading(true);
+    try {
+      const res: AuthResponse = await verifyOtpApi(data);
+      if (res && res.token) {
+        setToken(res.token);
+        setUser(res.user);
+        localStorage.setItem('dc-token', res.token);
+        localStorage.setItem('dc-user', JSON.stringify(res.user));
+        setAuthTokenInMemory(res.token);
+      }
+      return res?.user;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const registerDonor = async (data: RegisterRequest): Promise<AuthResponse> => {
     setLoading(true);
     try {
       const res: AuthResponse = await registerDonorApi(data);
-      setToken(res.token);
-      setUser(res.user);
-      localStorage.setItem('dc-token', res.token);
-      localStorage.setItem('dc-user', JSON.stringify(res.user));
-      setAuthTokenInMemory(res.token);
+      if (res && !res.requiresOtp && res.token) {
+        setToken(res.token);
+        setUser(res.user);
+        localStorage.setItem('dc-token', res.token);
+        localStorage.setItem('dc-user', JSON.stringify(res.user));
+        setAuthTokenInMemory(res.token);
+      }
+      return res;
     } finally {
       setLoading(false);
     }
@@ -112,6 +136,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated: !!token && !!user,
         loading,
         login,
+        verifyOtp,
         registerDonor,
         logout: handleLogout,
         refetchUser,

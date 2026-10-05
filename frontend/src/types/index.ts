@@ -12,11 +12,14 @@ export interface User {
   createdAt: string;
 }
 
+
 export interface RegisterRequest {
   email: string;
   password: string;
   fullName: string;
   role?: Role;
+  address?: string;
+  phone?: string;
 }
 
 export interface LoginRequest {
@@ -24,9 +27,15 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface VerifyOtpRequest {
+  email: string;
+  otp: string;
+}
+
 export interface AuthResponse {
-  token: string;
+  token: string | null;
   user: User;
+  requiresOtp?: boolean;
 }
 
 export interface NGOProfile {

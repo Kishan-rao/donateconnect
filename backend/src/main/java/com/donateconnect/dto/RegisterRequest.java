@@ -27,6 +27,10 @@ public class RegisterRequest {
     @Size(max = 100, message = "Full name cannot exceed 100 characters")
     private String fullName;
 
-    // Optional in request; defaults to DONOR. If passed, backend verifies it is DONOR.
+    // Optional in request; defaults to DONOR.
     private Role role;
+
+    // NGO Specific Fields
+    private String address;
+    private String phone;
 }

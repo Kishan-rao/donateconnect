@@ -17,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -46,7 +45,6 @@ class SecurityAndRbacTests {
     private User adminUser;
     private User ngoUser;
     private User volunteerUser;
-    private User corporateUser;
     private String donorToken;
     private String adminToken;
     private String ngoToken;
@@ -82,7 +80,7 @@ class SecurityAndRbacTests {
                 .role(Role.VOLUNTEER)
                 .build());
 
-        corporateUser = userRepository.save(User.builder()
+        userRepository.save(User.builder()
                 .email("corporate@test.com")
                 .passwordHash(passwordEncoder.encode("password123"))
                 .fullName("Test Corporate")
@@ -108,9 +106,9 @@ class SecurityAndRbacTests {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
+                .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.token").isNotEmpty())
+                .andExpect(jsonPath("$.data.requiresOtp").value(true))
                 .andExpect(jsonPath("$.data.user.role").value("DONOR"));
     }
 

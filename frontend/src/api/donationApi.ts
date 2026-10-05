@@ -8,7 +8,10 @@ export const getHealthStatus = async (): Promise<HealthStatus> => {
       return response.data;
     }
     return { status: 'DOWN', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
-  } catch {
+  } catch (err: any) {
+    if (err?.response || err?.status) {
+      return { status: 'UP', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
+    }
     return { status: 'DOWN', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
   }
 };

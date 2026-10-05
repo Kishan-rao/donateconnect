@@ -1,6 +1,17 @@
 import axios from 'axios';
+import { Capacitor } from '@capacitor/core';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const getBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (Capacitor.isNativePlatform()) {
+    return 'http://10.0.2.2:8080/api';
+  }
+  return '/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -43,6 +54,9 @@ apiClient.interceptors.response.use(
       logoutCallback();
     }
     const message = error.response?.data?.message || error.message || 'An unexpected error occurred';
-    return Promise.reject(new Error(message));
+    const err = new Error(message) as any;
+    err.response = error.response;
+    err.status = error.response?.status;
+    return Promise.reject(err);
   }
 );

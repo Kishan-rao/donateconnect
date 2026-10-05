@@ -13,9 +13,10 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
 
-@Slf4j
 @Service
 public class LocalStorageService implements StorageService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LocalStorageService.class);
 
     private static final Map<String, String> CONTENT_TYPE_MAP = Map.of(
             "jpg",  "image/jpeg",
