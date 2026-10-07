@@ -84,19 +84,40 @@ export const BlockchainLedgerPage: React.FC = () => {
                 <div className="space-y-2 text-xs font-mono text-[#111827]">
                   <div className="bg-[#FAF8F5] p-2.5 sm:p-3 rounded-xl border border-[#E5E7EB] min-w-0 w-full overflow-hidden">
                     <span className="text-[#6B7280] font-sans text-[11px] block mb-0.5">Hash:</span>
-                    <span className="text-[#7567E8] font-bold block break-all break-words [overflow-wrap:anywhere] select-all leading-relaxed">
+                    <span
+                      className="text-[#7567E8] font-bold block select-all leading-relaxed break-all break-words"
+                      style={{
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {block.hash}
                     </span>
                   </div>
                   <div className="bg-[#FAF8F5] p-2.5 sm:p-3 rounded-xl border border-[#E5E7EB] min-w-0 w-full overflow-hidden">
                     <span className="text-[#6B7280] font-sans text-[11px] block mb-0.5">Previous Hash:</span>
-                    <span className="text-[#4B5563] block break-all break-words [overflow-wrap:anywhere] select-all leading-relaxed">
+                    <span
+                      className="text-[#4B5563] block select-all leading-relaxed break-all break-words"
+                      style={{
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {block.previousHash}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between pt-1 text-[11px] font-sans text-[#4B5563] gap-2">
-                    <span className="shrink-0">Target Donation:</span>
-                    <span className="font-mono text-[#111827] font-bold truncate max-w-[65%] text-right select-all">
+                  <div className="bg-[#FAF8F5] p-2.5 sm:p-3 rounded-xl border border-[#E5E7EB] min-w-0 w-full overflow-hidden">
+                    <span className="text-[#6B7280] font-sans text-[11px] block mb-0.5">Target Donation:</span>
+                    <span
+                      className="text-[#111827] font-bold block select-all leading-relaxed break-all break-words"
+                      style={{
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere',
+                        whiteSpace: 'normal',
+                      }}
+                    >
                       {block.donationId}
                     </span>
                   </div>

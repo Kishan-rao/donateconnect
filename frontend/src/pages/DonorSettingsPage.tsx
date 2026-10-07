@@ -2,25 +2,21 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Capacitor } from '@capacitor/core';
 import { MobilePageHeader } from '../components/common/MobilePageHeader';
 import {
   User,
   Bell,
-  Shield,
-  Smartphone,
   LogOut,
   ChevronRight,
   Trash2,
   Lock,
   Mail,
   Sliders,
-  Check,
 } from 'lucide-react';
 
 export const DonorSettingsPage: React.FC = () => {
   const { user, logout } = useAuth();
-  const { showSuccess } = useToast();
+  const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
 
   // Local storage persisted preferences
@@ -53,7 +49,11 @@ export const DonorSettingsPage: React.FC = () => {
     const nextVal = !currentVal;
     setter(nextVal);
     localStorage.setItem(key, String(nextVal));
-    showSuccess(`${label} ${nextVal ? 'enabled' : 'disabled'}`);
+    if (nextVal) {
+      showSuccess(`${label} enabled`);
+    } else {
+      showError(`${label} disabled`);
+    }
   };
 
   const handleClearCache = () => {
@@ -77,7 +77,6 @@ export const DonorSettingsPage: React.FC = () => {
 
   if (!user) return null;
 
-  const isNative = Capacitor.isNativePlatform();
   const initial = user.fullName
     ? user.fullName.charAt(0).toUpperCase()
     : user.email.charAt(0).toUpperCase();
@@ -123,20 +122,12 @@ export const DonorSettingsPage: React.FC = () => {
         </div>
 
         <div className="space-y-2 text-xs text-[#4B5563]">
-          <div className="flex items-center justify-between py-2 border-b border-[#F3F4F6]">
+          <div className="flex items-center justify-between py-2">
             <span className="flex items-center gap-1.5 text-[#6B7280]">
               <Mail className="w-3.5 h-3.5 text-[#7567E8]" /> Primary Email
             </span>
             <span className="font-semibold text-[#111827] truncate max-w-[60%]">
               {user.email}
-            </span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-[#F3F4F6]">
-            <span className="flex items-center gap-1.5 text-[#6B7280]">
-              <Shield className="w-3.5 h-3.5 text-[#7567E8]" /> Authentication
-            </span>
-            <span className="font-semibold text-[#047857] bg-[#E6F4EA] px-2 py-0.5 rounded border border-[#A7F3D0]">
-              JWT Secure Session
             </span>
           </div>
         </div>
@@ -334,12 +325,12 @@ export const DonorSettingsPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. App Preferences & Environment Info */}
+      {/* 4. App Preferences */}
       <section className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-[#E5E7EB]">
           <Sliders className="w-4 h-4 text-[#7567E8]" />
           <h2 className="text-sm font-bold text-[#111827] uppercase tracking-wider">
-            App Preferences & Device Info
+            App Preferences
           </h2>
         </div>
 
@@ -376,28 +367,6 @@ export const DonorSettingsPage: React.FC = () => {
                 }`}
               />
             </button>
-          </div>
-
-          {/* Environment readout */}
-          <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#E5E7EB] space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[#6B7280] flex items-center gap-1.5">
-                <Smartphone className="w-3.5 h-3.5 text-[#7567E8]" /> Runtime Client
-              </span>
-              <span className="font-bold text-[#111827]">
-                {isNative ? 'Capacitor Android APK' : 'Modern Web Browser'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
-              <span className="text-[#6B7280]">Application Version</span>
-              <span className="font-mono text-[#111827] font-semibold">v0.1.0 (Android-First)</span>
-            </div>
-            <div className="flex items-center justify-between pt-1 border-t border-[#E5E7EB]">
-              <span className="text-[#6B7280]">Network Status</span>
-              <span className="font-bold text-[#047857] flex items-center gap-1">
-                <Check className="w-3 h-3" /> Online & Connected
-              </span>
-            </div>
           </div>
         </div>
       </section>
