@@ -72,9 +72,15 @@ export const LiveDriverTrackerModal: React.FC<LiveDriverTrackerModalProps> = ({
               <span className="w-2 h-2 rounded-full bg-[#34D399] animate-ping" />
               LIVE GPS &bull; {driverSpeed} km/h
             </div>
-            <div className="text-gray-300 font-mono flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-[#9186F2]" /> ETA:{' '}
-              <span className="text-white font-bold">{progress >= 100 ? 'ARRIVED!' : `${etaMinutes} Mins`}</span>
+            <div className="text-gray-300 font-mono flex items-center gap-1 text-xs">
+              <Clock className="w-3.5 h-3.5 text-[#9186F2] shrink-0" />
+              <span>ETA:</span>
+              <span
+                className="font-extrabold tracking-wide text-[#FFFFFF] tracker-eta-value"
+                style={{ color: '#FFFFFF' }}
+              >
+                {progress >= 100 ? 'ARRIVED!' : `${etaMinutes} Mins`}
+              </span>
             </div>
           </div>
 

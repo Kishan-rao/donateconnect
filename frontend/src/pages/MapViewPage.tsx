@@ -163,10 +163,10 @@ export const MapViewPage: React.FC = () => {
 
                 <Link
                   to={`/donate/new?ngoId=${selectedNgo.id}`}
-                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-xs shadow-xs min-h-[44px] active:scale-[0.98]"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-xs shadow-xs min-h-[44px] active:scale-[0.98] text-center"
                 >
-                  <HeartHandshake className="w-4 h-4 text-white" />
-                  Schedule Direct Donation Pickup &rarr;
+                  <HeartHandshake className="w-4 h-4 text-white shrink-0" />
+                  <span>Schedule Direct Donation Pickup</span>
                 </Link>
               </div>
             ) : (

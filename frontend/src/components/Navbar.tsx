@@ -22,6 +22,7 @@ import {
   PackageSearch,
   PackageCheck,
   User,
+  Settings,
   LogOut,
 } from 'lucide-react';
 import { HealthBadge } from './HealthBadge';
@@ -372,6 +373,9 @@ export const Navbar: React.FC = () => {
                         </Link>
                         <Link to="/donor/profile" className={drawerLinkClass('/donor/profile')}>
                           <User className="w-4 h-4 text-[#7567E8]" /> Donor Profile
+                        </Link>
+                        <Link to="/donor/settings" className={drawerLinkClass('/donor/settings')}>
+                          <Settings className="w-4 h-4 text-[#7567E8]" /> Settings
                         </Link>
                       </>
                     )}

@@ -243,7 +243,8 @@ textarea:focus {
   color: #4B5563 !important;
 }
 
-/* Ensure solid colored buttons keep their proper white text */
+/* Ensure solid colored buttons and tracker overlays keep their proper white text */
+.tracker-eta-value,
 button.bg-indigo-600,
 button.bg-rose-600,
 button.bg-red-600,

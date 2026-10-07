@@ -26,6 +26,7 @@ import { AdminProfilePage } from './pages/AdminProfilePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DonorProfilePage } from './pages/DonorProfilePage';
+import { DonorSettingsPage } from './pages/DonorSettingsPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { EmergencySosBanner } from './components/EmergencySosBanner';
@@ -56,6 +57,8 @@ const AppShell: React.FC = () => {
                 {/* Protected Donor Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['DONOR', 'ADMIN']} />}>
                   <Route path="/donor/profile" element={<DonorProfilePage />} />
+                  <Route path="/donor/settings" element={<DonorSettingsPage />} />
+                  <Route path="/settings" element={<Navigate to="/donor/settings" replace />} />
                   <Route path="/donate/new" element={<CreateDonationPage />} />
                   <Route path="/donations/new" element={<Navigate to="/donate/new" replace />} />
                   <Route path="/donations" element={<MyDonationsPage />} />
