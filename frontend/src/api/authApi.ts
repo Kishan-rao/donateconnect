@@ -3,23 +3,35 @@ import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, VerifyO
 
 export const registerDonorApi = async (data: RegisterRequest): Promise<AuthResponse> => {
   const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/register', {
-    role: 'DONOR',
+    role: data.role || 'DONOR',
     ...data,
   });
-  return response.data.data;
+  const payload = (response.data && 'data' in response.data && response.data.data) 
+    ? response.data.data 
+    : (response.data as unknown as AuthResponse);
+  return payload;
 };
 
 export const loginApi = async (data: LoginRequest): Promise<AuthResponse> => {
   const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/login', data);
-  return response.data.data;
+  const payload = (response.data && 'data' in response.data && response.data.data) 
+    ? response.data.data 
+    : (response.data as unknown as AuthResponse);
+  return payload;
 };
 
 export const verifyOtpApi = async (data: VerifyOtpRequest): Promise<AuthResponse> => {
   const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth/verify-otp', data);
-  return response.data.data;
+  const payload = (response.data && 'data' in response.data && response.data.data) 
+    ? response.data.data 
+    : (response.data as unknown as AuthResponse);
+  return payload;
 };
 
 export const getCurrentUserApi = async (): Promise<User> => {
   const response = await apiClient.get<ApiResponse<User>>('/auth/me');
-  return response.data.data;
+  const payload = (response.data && 'data' in response.data && response.data.data) 
+    ? response.data.data 
+    : (response.data as unknown as User);
+  return payload;
 };

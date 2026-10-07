@@ -28,7 +28,7 @@ export const OtpInput: React.FC<OtpInputProps> = ({ value, onChange, length = 6 
     if (e.key === 'Backspace') {
       const otpArray = value.split('');
       if (otpArray[index]) {
-        // If there's a value, just clear it
+        // If there's a value, clear current
         otpArray[index] = '';
         onChange(otpArray.join(''));
       } else if (index > 0) {
@@ -45,7 +45,7 @@ export const OtpInput: React.FC<OtpInputProps> = ({ value, onChange, length = 6 
     const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, length);
     if (pastedData) {
       onChange(pastedData);
-      // focus the next empty input or the last one
+      // Focus the next empty input or the last one
       const focusIndex = Math.min(pastedData.length, length - 1);
       inputRefs.current[focusIndex]?.focus();
     }
@@ -55,18 +55,23 @@ export const OtpInput: React.FC<OtpInputProps> = ({ value, onChange, length = 6 
   const paddedValue = value.padEnd(length, ' ');
 
   return (
-    <div className="flex justify-between gap-2" onPaste={handlePaste}>
+    <div
+      className="flex items-center justify-between gap-1.5 sm:gap-2.5 w-full max-w-sm mx-auto"
+      onPaste={handlePaste}
+    >
       {Array.from({ length }).map((_, index) => (
         <input
           key={index}
           ref={(el) => (inputRefs.current[index] = el)}
           type="text"
           inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete={index === 0 ? 'one-time-code' : 'off'}
           maxLength={1}
           value={paddedValue[index] === ' ' ? '' : paddedValue[index]}
           onChange={(e) => handleChange(index, e)}
           onKeyDown={(e) => handleKeyDown(index, e)}
-          className="w-12 h-14 bg-slate-950 border border-slate-800 rounded-xl text-center text-2xl font-bold text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+          className="flex-1 min-w-0 max-w-[48px] h-12 sm:h-14 rounded-xl border-2 border-[#E5E7EB] bg-[#F9FAFB] text-center text-xl sm:text-2xl font-extrabold text-[#111827] focus:outline-none focus:border-[#7567E8] focus:bg-white focus:ring-2 focus:ring-[#7567E8]/20 transition-all shadow-xs"
         />
       ))}
     </div>

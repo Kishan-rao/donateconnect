@@ -21,7 +21,7 @@ public class HealthController {
     @Value("${spring.mail.password:not-found}")
     private String smtpPass;
 
-    @GetMapping("/api/health")
+    @GetMapping({"/api/health", "/health"})
     public HealthResponse health() {
         return HealthResponse.builder()
                 .status("UP")

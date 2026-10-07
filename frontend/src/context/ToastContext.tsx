@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -41,34 +41,39 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={{ showSuccess, showError, showInfo }}>
       {children}
-      {/* Toast Notification Container */}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-md w-full pointer-events-none px-4">
+      {/* Toast Notification Container: elevated above Android bottom navigation on mobile */}
+      <div
+        aria-live="polite"
+        className="fixed bottom-20 md:bottom-6 left-3 right-3 md:left-auto md:right-6 z-50 flex flex-col gap-2 max-w-sm w-auto md:w-96 pointer-events-none mx-auto md:mx-0 safe-pb"
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-4 rounded-2xl border shadow-2xl flex items-start gap-3 transition-all duration-300 animate-slide-up ${
+            role="alert"
+            className={`pointer-events-auto p-3.5 sm:p-4 rounded-2xl border shadow-xl flex items-start gap-3 transition-all duration-200 animate-slide-up bg-white ${
               toast.type === 'success'
-                ? 'bg-slate-900/95 border-emerald-500/30 text-emerald-300'
+                ? 'border-[#A7F3D0] text-[#047857]'
                 : toast.type === 'error'
-                ? 'bg-slate-900/95 border-rose-500/30 text-rose-300'
-                : 'bg-slate-900/95 border-indigo-500/30 text-indigo-300'
+                ? 'border-[#FECACA] text-[#B91C1C]'
+                : 'border-[#BAE6FD] text-[#0369A1]'
             }`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-[#059669] shrink-0 mt-0.5" />
             ) : toast.type === 'error' ? (
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-[#DC2626] shrink-0 mt-0.5" />
             ) : (
-              <AlertCircle className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+              <Info className="w-5 h-5 text-[#0284C7] shrink-0 mt-0.5" />
             )}
 
-            <div className="flex-1 text-xs font-semibold leading-relaxed text-slate-100">
+            <div className="flex-1 text-xs font-semibold leading-relaxed text-[#111827]">
               {toast.message}
             </div>
 
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-white transition-colors p-0.5"
+              className="text-[#6B7280] hover:text-[#111827] transition-colors p-1 -mr-1 -mt-1 rounded-lg"
+              aria-label="Close notification"
             >
               <X className="w-4 h-4" />
             </button>

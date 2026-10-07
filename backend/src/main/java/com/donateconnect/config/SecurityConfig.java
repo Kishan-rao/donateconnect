@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000,https://localhost}")
+    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000,https://localhost,http://localhost,capacitor://localhost,http://192.168.29.227:8080,http://192.168.29.227:5173}")
     private String corsAllowedOrigins;
 
     @Bean
@@ -51,7 +51,7 @@ public class SecurityConfig {
         List<String> origins = Arrays.asList(corsAllowedOrigins.split(","));
         configuration.setAllowedOrigins(origins.stream().map(String::trim).toList());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -81,7 +81,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/health", "/api/dev-approve-all", "/api/debug-smtp").permitAll()
+                .requestMatchers("/api/health", "/health", "/api/dev-approve-all", "/api/debug-smtp").permitAll()
                 .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/verify-otp").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ngo", "/api/ngo/*", "/api/ngo/*/ratings").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/urgent-needs", "/api/impact").permitAll()

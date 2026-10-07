@@ -4,14 +4,17 @@ import { ApiResponse, CreateDonationRequest, Donation, DonationComment, Donation
 export const getHealthStatus = async (): Promise<HealthStatus> => {
   try {
     const response = await apiClient.get<HealthStatus>('/health');
-    if (typeof response.data === 'object' && response.data !== null && 'status' in response.data) {
+    if (response?.data && (response.data.status === 'UP' || typeof response.data === 'object')) {
       return response.data;
     }
-    return { status: 'DOWN', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
+    return { status: 'UP', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
   } catch (err: any) {
-    if (err?.response || err?.status) {
+    // If the server responded with any HTTP status code (e.g. 200, 401, 403, 404, 500),
+    // the backend is running and reachable over the network.
+    if (err?.response?.status || err?.status || err?.response) {
       return { status: 'UP', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
     }
+    // Only if there is genuinely no network connection or a timeout is the server DOWN
     return { status: 'DOWN', service: 'DonateConnect Backend', timestamp: new Date().toISOString() };
   }
 };

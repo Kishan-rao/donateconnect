@@ -3,6 +3,7 @@ import { getDonationById } from '../api/donationApi';
 import { Donation, DonationStatus } from '../types';
 import { formatDate } from '../utils/formatters';
 import { getPhotoUrl } from '../utils/photoHelper';
+import { MobileBottomSheet } from './common/MobileBottomSheet';
 import {
   X,
   Building2,
@@ -119,47 +120,74 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-[#111827]/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white border border-[#E5E7EB] rounded-2xl max-w-2xl w-full p-6 relative flex flex-col space-y-6 my-auto shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#7567E8]/10 border border-[#7567E8]/20 flex items-center justify-center text-[#7567E8] font-bold">
-              <Eye className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-extrabold text-[#111827]">Donation Inspector</h3>
-                {donation && (
-                  <span
-                    className={`text-[11px] font-bold tracking-wider px-2 py-0.5 rounded border ${getStatusBadgeStyle(
-                      donation.status
-                    )}`}
-                  >
-                    {donation.status}
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-[#4B5563] mt-0.5">
-                ID: <span className="font-mono text-[#111827]">{donationId}</span>
-              </p>
-            </div>
+    <>
+      <MobileBottomSheet
+        isOpen={true}
+        onClose={onClose}
+        title={
+          <div className="flex items-center gap-2">
+            <span>Donation Inspector</span>
+            {donation && (
+              <span
+                className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded border ${getStatusBadgeStyle(
+                  donation.status
+                )}`}
+              >
+                {donation.status}
+              </span>
+            )}
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl bg-[#F9FAFB] text-[#4B5563] hover:text-[#111827] hover:bg-[#F4F2FA] transition-colors"
-            title="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        }
+        subtitle={
+          <span>
+            ID: <span className="font-mono text-[#111827]">{donationId}</span>
+          </span>
+        }
+        icon={
+          <div className="w-9 h-9 rounded-xl bg-[#7567E8]/10 border border-[#7567E8]/20 flex items-center justify-center text-[#7567E8] font-bold">
+            <Eye className="w-4.5 h-4.5" />
+          </div>
+        }
+        maxWidthClass="max-w-2xl"
+        footer={
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 w-full">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {donation && onOpenTracker && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenTracker(donation);
+                  }}
+                  className="flex-1 sm:flex-none h-11 min-h-[44px] px-3.5 rounded-xl text-xs font-bold border transition-colors bg-[#7567E8]/10 hover:bg-[#7567E8]/20 text-[#7567E8] border-[#7567E8]/20 flex items-center justify-center gap-1.5 touch-manipulation"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-[#7567E8]" />
+                  Live GPS
+                </button>
+              )}
 
+              {donation && onOpenChat && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenChat(donation);
+                  }}
+                  className="flex-1 sm:flex-none h-11 min-h-[44px] px-3.5 rounded-xl text-xs font-bold border transition-colors bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm flex items-center justify-center gap-1.5 touch-manipulation"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-[#7567E8]" />
+                  Chat
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={onClose}
+              className="h-11 min-h-[44px] px-5 rounded-xl font-bold text-xs transition-colors bg-[#F9FAFB] hover:bg-[#F4F2FA] text-[#111827] border border-[#E5E7EB] touch-manipulation flex items-center justify-center"
+            >
+              Close
+            </button>
+          </div>
+        }
+      >
         {/* Modal Body */}
         {loading ? (
           <div className="py-16 text-center space-y-3">
@@ -172,7 +200,7 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
             <p className="text-sm font-bold">{error}</p>
             <button
               onClick={fetchDetail}
-              className="px-4 py-2 rounded-xl bg-[#DC2626] hover:bg-[#DC2626]/90 text-white text-xs font-bold transition-colors flex items-center gap-2 mx-auto shadow-sm"
+              className="px-4 py-2.5 min-h-[44px] rounded-xl bg-[#DC2626] hover:bg-[#DC2626]/90 text-white text-xs font-bold transition-colors flex items-center gap-2 mx-auto shadow-sm touch-manipulation"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Retry Fetch
             </button>
@@ -180,7 +208,7 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
         ) : donation ? (
           <div className="space-y-6">
             {/* Lifecycle Timeline */}
-            <div className="p-5 rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB] space-y-3">
+            <div className="p-4 sm:p-5 rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB] space-y-3">
               <h4 className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-[#4B5563]">
                 <Clock className="w-3.5 h-3.5 text-[#7567E8]" />
                 Status Timeline & Lifecycle
@@ -242,7 +270,7 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
             </div>
 
             {/* Key Meta Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {/* NGO Information Card */}
               <div className="p-4 rounded-xl border border-[#E5E7EB] bg-white space-y-2 shadow-sm">
                 <div className="flex items-center justify-between">
@@ -253,12 +281,12 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 font-bold text-base text-[#111827]">
+                <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-[#111827]">
                   <Building2 className="w-4.5 h-4.5 text-[#7567E8] shrink-0" />
-                  <span>{donation.ngo?.name || 'NGO Partner'}</span>
+                  <span className="truncate">{donation.ngo?.name || 'NGO Partner'}</span>
                 </div>
                 {donation.ngo?.address && (
-                  <p className="text-xs text-[#4B5563]">Address: {donation.ngo.address}</p>
+                  <p className="text-xs text-[#4B5563] truncate">Address: {donation.ngo.address}</p>
                 )}
                 {donation.ngo?.phone && (
                   <p className="text-xs text-[#4B5563]">Phone: {donation.ngo.phone}</p>
@@ -309,19 +337,19 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
               </h4>
 
               {donation.photoUrls && donation.photoUrls.length > 0 ? (
-                <div className="flex gap-3 overflow-x-auto pb-2">
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
                   {donation.photoUrls.map((url, idx) => {
                     const fullUrl = getPhotoUrl(url);
                     return (
                       <button
                         key={idx}
                         onClick={() => setSelectedPhoto(fullUrl)}
-                        className="group relative rounded-xl overflow-hidden border border-[#E5E7EB] hover:border-[#7567E8] transition-colors shrink-0"
+                        className="group relative rounded-xl overflow-hidden border border-[#E5E7EB] hover:border-[#7567E8] transition-colors shrink-0 touch-manipulation"
                       >
                         <img
                           src={fullUrl}
                           alt={`Donation attachment ${idx + 1}`}
-                          className="w-24 h-24 object-cover group-hover:scale-105 transition-transform duration-200"
+                          className="w-20 h-20 sm:w-24 sm:h-24 object-cover group-hover:scale-105 transition-transform duration-200"
                           onError={(e) => {
                             (e.target as HTMLElement).style.display = 'none';
                           }}
@@ -341,50 +369,12 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
             </div>
           </div>
         ) : null}
-
-        {/* Modal Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[#E5E7EB] pt-4">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {donation && onOpenTracker && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenTracker(donation);
-                }}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors bg-[#7567E8]/10 hover:bg-[#7567E8]/20 text-[#7567E8] border-[#7567E8]/20"
-              >
-                <Navigation className="w-3.5 h-3.5 text-[#7567E8]" />
-                Live Driver GPS
-              </button>
-            )}
-
-            {donation && onOpenChat && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenChat(donation);
-                }}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-[#7567E8]" />
-                Chat with NGO
-              </button>
-            )}
-          </div>
-
-          <button
-            onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2 rounded-xl font-bold text-xs transition-colors bg-[#F9FAFB] hover:bg-[#F4F2FA] text-[#111827] border border-[#E5E7EB]"
-          >
-            Close Inspector
-          </button>
-        </div>
-      </div>
+      </MobileBottomSheet>
 
       {/* Lightbox Photo Overlay */}
       {selectedPhoto && (
         <div
-          className="fixed inset-0 z-60 bg-[#111827]/80 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-60 bg-[#111827]/85 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setSelectedPhoto(null)}
         >
           <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
@@ -395,13 +385,13 @@ export const DonationDetailModal: React.FC<DonationDetailModalProps> = ({
             />
             <button
               onClick={() => setSelectedPhoto(null)}
-              className="absolute -top-4 -right-4 p-2 rounded-full bg-white text-[#111827] border border-[#E5E7EB] shadow-lg hover:bg-[#F9FAFB]"
+              className="absolute -top-3 -right-3 p-2.5 min-w-[44px] min-h-[44px] rounded-full bg-white text-[#111827] border border-[#E5E7EB] shadow-lg hover:bg-[#F9FAFB] flex items-center justify-center touch-manipulation"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };

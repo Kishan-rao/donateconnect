@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getMyVolunteerTasks, getAvailablePickups, claimVolunteerPickup, updateVolunteerTaskStatus } from '../api/volunteerApi';
 import { Donation, PageResponse, VolunteerTask } from '../types';
 import { useToast } from '../context/ToastContext';
-import { Truck, CheckCircle2, MapPin, Calendar, Clock, RefreshCw, PackageSearch, ChevronRight } from 'lucide-react';
+import { Truck, CheckCircle2, MapPin, Calendar, Clock, RefreshCw, PackageSearch, ChevronRight, Loader2 } from 'lucide-react';
 
 type DashboardTab = 'my-tasks' | 'available';
 
@@ -61,7 +61,6 @@ export const DriverDashboardPage: React.FC = () => {
     try {
       await claimVolunteerPickup(donationId);
       showSuccess('Pickup claimed successfully!');
-      // Refresh both tabs
       setActiveTab('my-tasks');
     } catch (err: any) {
       showError(err.message || 'Failed to claim pickup');
@@ -70,45 +69,71 @@ export const DriverDashboardPage: React.FC = () => {
     }
   };
 
-  const tabButtonClass = (tab: DashboardTab) =>
-    `px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-      activeTab === tab
-        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-        : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-    }`;
-
   return (
-    <div className="space-y-6 py-6 max-w-7xl mx-auto px-4">
+    <div className="space-y-4 sm:space-y-6 py-3 sm:py-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            <Truck className="w-8 h-8 text-amber-400" />
-            Volunteer Driver Console
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#111827] tracking-tight flex items-center gap-2.5">
+            <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-[#7567E8]" />
+            Driver Console
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Claim and manage donation pickups from donors to NGO partners
+          <p className="text-[#6B7280] text-xs sm:text-sm mt-0.5">
+            Claim and fulfill community donation pickups to NGO relief centers
           </p>
         </div>
 
         <button
-          onClick={() => activeTab === 'my-tasks' ? fetchMyTasks() : fetchAvailable()}
+          onClick={() => (activeTab === 'my-tasks' ? fetchMyTasks() : fetchAvailable())}
           disabled={loading}
-          className="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition-colors border border-slate-700 self-start md:self-auto"
+          className="self-start sm:self-auto w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-white text-[#4B5563] hover:text-[#111827] hover:bg-[#F4F2FA] transition-colors border border-[#E5E7EB] shadow-xs flex items-center justify-center shrink-0 active:scale-95"
+          aria-label="Refresh tasks"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="flex gap-3">
-        <button onClick={() => setActiveTab('my-tasks')} className={tabButtonClass('my-tasks')}>
-          My Tasks {tasks.length > 0 && <span className="ml-1.5 text-xs bg-white/10 px-1.5 py-0.5 rounded">{tasks.length}</span>}
+      {/* Android Segmented Switcher Tabs */}
+      <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#F9FAFB] rounded-2xl border border-[#E5E7EB]">
+        <button
+          onClick={() => setActiveTab('my-tasks')}
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all min-h-[44px] active:scale-[0.98] ${
+            activeTab === 'my-tasks'
+              ? 'bg-[#7567E8] text-white shadow-xs'
+              : 'text-[#4B5563] hover:text-[#111827]'
+          }`}
+        >
+          <Truck className="w-4 h-4" />
+          <span>My Tasks</span>
+          {tasks.length > 0 && (
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-md font-extrabold ${
+                activeTab === 'my-tasks' ? 'bg-white/20 text-white' : 'bg-[#E5E7EB] text-[#111827]'
+              }`}
+            >
+              {tasks.length}
+            </span>
+          )}
         </button>
-        <button onClick={() => setActiveTab('available')} className={tabButtonClass('available')}>
-          <PackageSearch className="w-4 h-4 inline mr-1.5" />
-          Available Pickups
-          {available && <span className="ml-1.5 text-xs bg-white/10 px-1.5 py-0.5 rounded">{available.totalElements}</span>}
+        <button
+          onClick={() => setActiveTab('available')}
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all min-h-[44px] active:scale-[0.98] ${
+            activeTab === 'available'
+              ? 'bg-[#7567E8] text-white shadow-xs'
+              : 'text-[#4B5563] hover:text-[#111827]'
+          }`}
+        >
+          <PackageSearch className="w-4 h-4" />
+          <span>Available Pickups</span>
+          {available && (
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-md font-extrabold ${
+                activeTab === 'available' ? 'bg-white/20 text-white' : 'bg-[#E5E7EB] text-[#111827]'
+              }`}
+            >
+              {available.totalElements}
+            </span>
+          )}
         </button>
       </div>
 
@@ -116,71 +141,89 @@ export const DriverDashboardPage: React.FC = () => {
       {activeTab === 'my-tasks' && (
         <>
           {loading ? (
-            <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 text-slate-400 text-sm">
-              Loading your dispatch routes...
+            <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] text-[#6B7280] text-xs font-medium space-y-2">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#7567E8]" />
+              <p>Loading your dispatch routes...</p>
             </div>
           ) : tasks.length === 0 ? (
-            <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 space-y-3">
-              <Truck className="w-12 h-12 text-slate-600 mx-auto" />
-              <h3 className="text-slate-300 font-semibold text-base">No active pickup assignments</h3>
-              <p className="text-slate-500 text-xs max-w-sm mx-auto">
-                Browse <button onClick={() => setActiveTab('available')} className="text-indigo-400 hover:underline">Available Pickups</button> to claim your next delivery.
+            <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] space-y-3 p-6 shadow-xs">
+              <Truck className="w-12 h-12 text-[#9CA3AF] mx-auto" />
+              <h3 className="text-[#111827] font-extrabold text-base">No active pickup assignments</h3>
+              <p className="text-[#6B7280] text-xs max-w-sm mx-auto">
+                Switch to{' '}
+                <button
+                  onClick={() => setActiveTab('available')}
+                  className="text-[#7567E8] font-bold underline"
+                >
+                  Available Pickups
+                </button>{' '}
+                to claim an open donation delivery.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
               {tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-4"
+                  className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-3.5 shadow-xs"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-500/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#7567E8] bg-[#7567E8]/10 px-2.5 py-0.5 rounded-lg border border-[#7567E8]/20">
                         {task.donation.category}
                       </span>
-                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-lg bg-[#FAF8F5] text-[#111827] border border-[#E5E7EB] font-mono">
                         {task.status}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-white mb-1">
+                    <h3 className="text-sm font-extrabold text-[#111827] mb-1">
                       → {task.donation.ngo?.name}
                     </h3>
-                    <p className="text-xs text-slate-300 mb-3">{task.donation.description || 'Standard packaged donation.'}</p>
+                    <p className="text-xs text-[#4B5563] mb-3 line-clamp-2">
+                      {task.donation.description || 'Standard packaged donation.'}
+                    </p>
 
-                    <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1.5">
-                      <div className="flex items-center gap-1.5 text-slate-300">
-                        <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-                        <span><strong>NGO Hub:</strong> {task.donation.ngo?.address}</span>
+                    <div className="bg-[#FAF8F5] p-3 rounded-xl border border-[#E5E7EB] text-xs space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-[#111827]">
+                        <MapPin className="w-3.5 h-3.5 text-[#7567E8] shrink-0" />
+                        <span className="truncate">
+                          <strong>NGO Hub:</strong> {task.donation.ngo?.address}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-slate-300">
-                        <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                        <span><strong>Pickup Date:</strong> {task.donation.pickupDate || 'Flexible'}</span>
+                      <div className="flex items-center gap-1.5 text-[#111827]">
+                        <Calendar className="w-3.5 h-3.5 text-[#7567E8] shrink-0" />
+                        <span>
+                          <strong>Pickup Date:</strong> {task.donation.pickupDate || 'Flexible'}
+                        </span>
                       </div>
                       {task.routeNotes && (
-                        <div className="flex items-center gap-1.5 text-slate-400">
-                          <Clock className="w-3.5 h-3.5 text-slate-500" />
-                          <span><strong>Notes:</strong> {task.routeNotes}</span>
+                        <div className="flex items-center gap-1.5 text-[#6B7280]">
+                          <Clock className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
+                          <span>
+                            <strong>Notes:</strong> {task.routeNotes}
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-800 pt-3 flex items-center gap-2">
+                  {/* Task Status Transition Buttons */}
+                  <div className="border-t border-[#E5E7EB] pt-3 flex items-center gap-2">
                     <button
                       onClick={() => handleStatusChange(task.id, 'IN_TRANSIT')}
                       disabled={task.status !== 'CLAIMED'}
-                      className="flex-1 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:opacity-40 text-white text-xs font-bold transition-all"
+                      className="flex-1 py-2.5 px-2 rounded-xl bg-[#FFFBEB] hover:bg-[#D97706] disabled:opacity-40 text-[#B45309] hover:text-white text-xs font-bold transition-all border border-[#FDE68A] min-h-[44px] flex items-center justify-center gap-1.5 active:scale-95"
                     >
-                      🚚 Mark In-Transit
+                      <Truck className="w-4 h-4" />
+                      Mark In-Transit
                     </button>
                     <button
                       onClick={() => handleStatusChange(task.id, 'COMPLETED')}
                       disabled={task.status !== 'IN_TRANSIT'}
-                      className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold transition-all flex items-center justify-center gap-1"
+                      className="flex-1 py-2.5 px-2 rounded-xl bg-[#ECFDF5] hover:bg-[#059669] disabled:opacity-40 text-[#047857] hover:text-white text-xs font-bold transition-all border border-[#A7F3D0] min-h-[44px] flex items-center justify-center gap-1.5 active:scale-95"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <CheckCircle2 className="w-4 h-4" />
                       Mark Completed
                     </button>
                   </div>
@@ -195,43 +238,48 @@ export const DriverDashboardPage: React.FC = () => {
       {activeTab === 'available' && (
         <>
           {loading ? (
-            <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 text-slate-400 text-sm">
-              Loading available pickups...
+            <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] text-[#6B7280] text-xs font-medium space-y-2">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#7567E8]" />
+              <p>Loading available pickups...</p>
             </div>
           ) : !available || !Array.isArray(available.content) || available.content.length === 0 ? (
-            <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 space-y-3">
-              <PackageSearch className="w-12 h-12 text-slate-600 mx-auto" />
-              <h3 className="text-slate-300 font-semibold text-base">No available pickups right now</h3>
-              <p className="text-slate-500 text-xs max-w-sm mx-auto">
-                Check back later — new accepted donations appear here when NGOs approve them.
+            <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] space-y-3 p-6 shadow-xs">
+              <PackageSearch className="w-12 h-12 text-[#9CA3AF] mx-auto" />
+              <h3 className="text-[#111827] font-extrabold text-base">No available pickups right now</h3>
+              <p className="text-[#6B7280] text-xs max-w-sm mx-auto">
+                Check back shortly — accepted donations appear here once approved by NGO partners.
               </p>
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
                 {available.content.map((donation) => (
                   <div
                     key={donation.id}
-                    className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-indigo-500/40 transition-colors"
+                    className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-5 flex flex-col justify-between space-y-3 shadow-xs hover:border-[#7567E8]/30 transition-colors"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#059669] bg-[#ECFDF5] px-2.5 py-0.5 rounded-lg border border-[#A7F3D0]">
                           {donation.category}
                         </span>
-                        <span className="text-xs text-slate-500 font-mono">{donation.id.substring(0, 8)}...</span>
+                        <span className="text-xs text-[#9CA3AF] font-mono">
+                          #{donation.id.substring(0, 8)}
+                        </span>
                       </div>
-                      <h3 className="text-sm font-bold text-white mb-1">{donation.ngo?.name}</h3>
-                      <p className="text-xs text-slate-400 line-clamp-2">{donation.description}</p>
+                      <h3 className="text-sm font-extrabold text-[#111827] mb-1">
+                        {donation.ngo?.name}
+                      </h3>
+                      <p className="text-xs text-[#4B5563] line-clamp-2">{donation.description}</p>
 
-                      <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 mt-3 text-xs text-[#6B7280]">
+                        <span className="flex items-center gap-1 truncate">
+                          <MapPin className="w-3.5 h-3.5 text-[#7567E8] shrink-0" />
                           {donation.ngo?.address || 'N/A'}
                         </span>
                         {donation.pickupDate && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
+                          <span className="flex items-center gap-1 shrink-0 text-[#7567E8] font-semibold">
+                            <Calendar className="w-3.5 h-3.5" />
                             {donation.pickupDate}
                           </span>
                         )}
@@ -241,17 +289,17 @@ export const DriverDashboardPage: React.FC = () => {
                     <button
                       onClick={() => handleClaim(donation.id)}
                       disabled={claiming === donation.id}
-                      className="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all flex items-center justify-center gap-2"
+                      className="w-full py-2.5 px-4 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 disabled:opacity-50 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 min-h-[44px] shadow-xs active:scale-[0.98]"
                     >
                       {claiming === donation.id ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                           Claiming...
                         </>
                       ) : (
                         <>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                          Claim Pickup
+                          <ChevronRight className="w-4 h-4" />
+                          Claim Pickup Delivery
                         </>
                       )}
                     </button>
@@ -261,27 +309,27 @@ export const DriverDashboardPage: React.FC = () => {
 
               {/* Pagination */}
               {available.totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 pt-4">
+                <div className="flex items-center justify-center gap-3 pt-2">
                   <button
                     onClick={() => fetchAvailable(available.number - 1)}
                     disabled={available.number === 0}
-                    className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold disabled:opacity-40 hover:bg-slate-700 transition-colors"
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#4B5563] text-xs font-bold disabled:opacity-40 min-h-[38px] active:scale-95"
                   >
                     ← Previous
                   </button>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-[#6B7280]">
                     Page {available.number + 1} of {available.totalPages}
                   </span>
                   <button
                     onClick={() => fetchAvailable(available.number + 1)}
                     disabled={available.number >= available.totalPages - 1}
-                    className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold disabled:opacity-40 hover:bg-slate-700 transition-colors"
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#4B5563] text-xs font-bold disabled:opacity-40 min-h-[38px] active:scale-95"
                   >
                     Next →
                   </button>
                 </div>
               )}
-            </>
+            </div>
           )}
         </>
       )}

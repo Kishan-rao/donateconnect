@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import { CommentThread } from '../components/CommentThread';
 import { LiveDriverTrackerModal } from '../components/LiveDriverTrackerModal';
 import { DonationDetailModal } from '../components/DonationDetailModal';
+import { MobileBottomSheet } from '../components/common/MobileBottomSheet';
+import { MobileStatusBadge } from '../components/common/MobileStatusBadge';
 import {
   PlusCircle,
   RefreshCw,
@@ -16,7 +18,6 @@ import {
   Calendar,
   Filter,
   MessageSquare,
-  X,
   Navigation,
   ChevronLeft,
   ChevronRight,
@@ -60,20 +61,6 @@ export const MyDonationsPage: React.FC = () => {
     fetchDonations(page, size);
   }, [page, size]);
 
-  const getStatusBadgeStyle = (status: DonationStatus) => {
-    switch (status) {
-      case 'ACCEPTED':
-      case 'DELIVERED':
-        return 'bg-[#E6F4EA] text-[#047857] border-[#A7F3D0]';
-      case 'REJECTED':
-        return 'bg-[#FEE2E2] text-[#B91C1C] border-[#FCA5A5]';
-      case 'PICKED_UP':
-      case 'REQUESTED':
-      default:
-        return 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]';
-    }
-  };
-
   const rawDonations = pageData?.content || [];
   const totalElements = pageData?.totalElements || 0;
   const totalPages = pageData?.totalPages || 0;
@@ -87,84 +74,85 @@ export const MyDonationsPage: React.FC = () => {
   const deliveredCount = rawDonations.filter((d) => d.status === 'DELIVERED').length;
 
   return (
-    <div className="space-y-8 py-6">
+    <div className="space-y-5 sm:space-y-6 py-3 sm:py-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#111827] tracking-tight flex items-center gap-3">
-            <HeartHandshake className="w-8 h-8 text-[#7567E8]" />
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#111827] tracking-tight flex items-center gap-2.5">
+            <HeartHandshake className="w-6 h-6 sm:w-8 sm:h-8 text-[#7567E8]" />
             My Donations
           </h1>
-          <p className="text-[#4B5563] text-sm mt-1">
+          <p className="text-[#6B7280] text-xs sm:text-sm mt-0.5">
             View and track your complete donation history
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
           <button
             onClick={() => fetchDonations(page, size)}
             disabled={loading}
-            className="p-2.5 rounded-xl bg-white text-[#4B5563] hover:text-[#111827] hover:bg-[#F4F2FA] transition-colors border border-[#E5E7EB] shadow-sm"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl bg-white text-[#4B5563] hover:text-[#111827] hover:bg-[#F4F2FA] transition-colors border border-[#E5E7EB] shadow-xs flex items-center justify-center shrink-0 active:scale-95"
             title="Refresh list"
+            aria-label="Refresh list"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Link
             to="/donate/new"
-            className="px-4 py-2.5 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+            className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs min-h-[44px] active:scale-[0.98]"
           >
             <PlusCircle className="w-4 h-4 text-white" />
-            New Donation Request
+            New Donation
           </Link>
         </div>
       </div>
 
-      {/* Summary Metrics Section */}
+      {/* Summary Metrics Section (2-cols on mobile, 3-cols on tablet+) */}
       {!loading && !error && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 flex items-center gap-4 shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)]">
-            <div className="w-12 h-12 rounded-xl bg-[#7567E8]/10 border border-[#7567E8]/20 flex items-center justify-center text-[#7567E8]">
-              <HeartHandshake className="w-6 h-6" />
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3.5 shadow-xs text-center sm:text-left">
+            <div className="w-10 h-10 rounded-xl bg-[#7567E8]/10 text-[#7567E8] flex items-center justify-center shrink-0">
+              <HeartHandshake className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-[#4B5563]">Total Donations</p>
-              <h3 className="text-2xl font-extrabold text-[#111827] mt-0.5">{totalDonationsCount}</h3>
+              <p className="text-[10px] sm:text-xs font-semibold text-[#6B7280] uppercase">Total</p>
+              <h3 className="text-lg sm:text-2xl font-extrabold text-[#111827]">{totalDonationsCount}</h3>
             </div>
           </div>
 
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 flex items-center gap-4 shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)]">
-            <div className="w-12 h-12 rounded-xl bg-[#7567E8]/10 border border-[#7567E8]/20 flex items-center justify-center text-[#7567E8]">
-              <Building2 className="w-6 h-6" />
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3.5 shadow-xs text-center sm:text-left">
+            <div className="w-10 h-10 rounded-xl bg-[#7567E8]/10 text-[#7567E8] flex items-center justify-center shrink-0">
+              <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-[#4B5563]">NGOs Supported</p>
-              <h3 className="text-2xl font-extrabold text-[#111827] mt-0.5">{uniqueNgosCount}</h3>
+              <p className="text-[10px] sm:text-xs font-semibold text-[#6B7280] uppercase">NGOs</p>
+              <h3 className="text-lg sm:text-2xl font-extrabold text-[#111827]">{uniqueNgosCount}</h3>
             </div>
           </div>
 
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 flex items-center gap-4 shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)]">
-            <div className="w-12 h-12 rounded-xl bg-[#059669]/10 border border-[#059669]/20 flex items-center justify-center text-[#059669]">
-              <PackageCheck className="w-6 h-6" />
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3.5 shadow-xs text-center sm:text-left">
+            <div className="w-10 h-10 rounded-xl bg-[#ECFDF5] text-[#059669] flex items-center justify-center shrink-0">
+              <PackageCheck className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-[#4B5563]">Delivered Donations</p>
-              <h3 className="text-2xl font-extrabold text-[#111827] mt-0.5">{deliveredCount}</h3>
+              <p className="text-[10px] sm:text-xs font-semibold text-[#6B7280] uppercase">Delivered</p>
+              <h3 className="text-lg sm:text-2xl font-extrabold text-[#111827]">{deliveredCount}</h3>
             </div>
           </div>
         </div>
       )}
 
-      {/* Status Filter Bar */}
+      {/* Horizontal Filter Chips Bar */}
       {!loading && !error && totalElements > 0 && (
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-          <Filter className="w-4 h-4 text-[#6B7280] shrink-0" />
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1">
+          <Filter className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0 mr-1 hidden xs:block" />
           {['ALL', 'REQUESTED', 'ACCEPTED', 'PICKED_UP', 'DELIVERED', 'REJECTED'].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border min-h-[38px] active:scale-95 ${
                 statusFilter === status
-                  ? 'bg-[#7567E8] text-white border-[#9186F2] shadow-sm'
+                  ? 'bg-[#7567E8] text-white border-[#7567E8] shadow-xs'
                   : 'bg-white text-[#4B5563] border-[#E5E7EB] hover:bg-[#F4F2FA] hover:text-[#111827]'
               }`}
             >
@@ -176,61 +164,57 @@ export const MyDonationsPage: React.FC = () => {
 
       {/* Main Content Area */}
       {loading ? (
-        /* Loading Skeleton State */
-        <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)] space-y-4">
-          <div className="w-10 h-10 border-3 border-[#7567E8] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-[#4B5563] text-sm font-medium">Loading your donation history...</p>
+        <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3">
+          <div className="w-8 h-8 border-3 border-[#7567E8] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[#6B7280] text-xs font-medium">Loading donation history...</p>
         </div>
       ) : error ? (
-        /* Error State with Retry */
-        <div className="p-8 rounded-2xl bg-[#FEE2E2] border border-[#FCA5A5] text-center space-y-4 max-w-md mx-auto my-8">
-          <AlertTriangle className="w-10 h-10 text-[#DC2626] mx-auto" />
+        <div className="p-6 rounded-2xl bg-[#FEE2E2] border border-[#FCA5A5] text-center space-y-3 max-w-md mx-auto my-6">
+          <AlertTriangle className="w-8 h-8 text-[#DC2626] mx-auto" />
           <div>
-            <h3 className="text-lg font-bold text-[#111827]">Unable to load donation history.</h3>
-            <p className="text-[#4B5563] text-sm mt-1">{error}</p>
+            <h3 className="text-sm font-bold text-[#111827]">Unable to load donation history</h3>
+            <p className="text-[#6B7280] text-xs mt-0.5">{error}</p>
           </div>
           <button
             onClick={() => fetchDonations(page, size)}
-            className="px-5 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#DC2626]/90 text-white font-bold text-xs transition-colors shadow-sm"
+            className="px-4 py-2 rounded-xl bg-[#DC2626] hover:bg-[#DC2626]/90 text-white font-bold text-xs transition-colors shadow-xs"
           >
-            Please try again (Retry)
+            Retry Connection
           </button>
         </div>
       ) : totalElements === 0 ? (
-        /* Empty State */
-        <div className="text-center py-20 bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)] space-y-4">
-          <div className="w-16 h-16 rounded-full bg-[#7567E8]/10 flex items-center justify-center mx-auto text-[#7567E8]">
-            <HeartHandshake className="w-8 h-8" />
+        <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] shadow-xs space-y-3 p-6">
+          <div className="w-14 h-14 rounded-full bg-[#7567E8]/10 flex items-center justify-center mx-auto text-[#7567E8]">
+            <HeartHandshake className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-extrabold text-xl text-[#111827]">No donations yet</h3>
-            <p className="text-[#4B5563] text-sm max-w-sm mx-auto">
-              Your donation history will appear here once you make your first donation.
+            <h3 className="font-extrabold text-lg text-[#111827]">No donations yet</h3>
+            <p className="text-[#6B7280] text-xs max-w-xs mx-auto">
+              Your donation history will appear here once you submit your first donation.
             </p>
           </div>
           <Link
             to="/donate/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-sm transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7567E8] hover:bg-[#7567E8]/90 text-white font-bold text-xs sm:text-sm transition-all shadow-xs min-h-[44px]"
           >
             <PlusCircle className="w-4 h-4 text-white" />
             Start a Donation
           </Link>
         </div>
       ) : (
-        /* Data Presentation */
-        <div className="space-y-6">
-          {/* Desktop Table Layout */}
-          <div className="hidden md:block overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)]">
+        <div className="space-y-4">
+          {/* Desktop Table Layout (md+ screens) */}
+          <div className="hidden md:block overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-xs">
             <table className="w-full text-left text-sm">
               <thead className="text-xs uppercase font-extrabold border-b border-[#E5E7EB] bg-[#F9FAFB] text-[#4B5563]">
                 <tr>
-                  <th className="py-3.5 px-4">Date</th>
-                  <th className="py-3.5 px-4">NGO</th>
-                  <th className="py-3.5 px-4">Category</th>
-                  <th className="py-3.5 px-4 max-w-xs">Description</th>
-                  <th className="py-3.5 px-4">Pickup Date</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">NGO</th>
+                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4 max-w-xs">Description</th>
+                  <th className="py-3 px-4">Pickup Date</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E7EB] text-[#111827]">
@@ -240,48 +224,42 @@ export const MyDonationsPage: React.FC = () => {
                     className="hover:bg-[#F4F2FA] transition-colors cursor-pointer"
                     onClick={() => setDetailDonationId(donation.id)}
                   >
-                    <td className="py-4 px-4 whitespace-nowrap text-xs text-[#4B5563]">
+                    <td className="py-3.5 px-4 whitespace-nowrap text-xs text-[#6B7280]">
                       {formatDate(donation.createdAt)}
                     </td>
-                    <td className="py-4 px-4 font-extrabold max-w-[180px] break-words text-[#111827]">
+                    <td className="py-3.5 px-4 font-bold max-w-[180px] break-words text-[#111827]">
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4 text-[#7567E8] shrink-0" />
                         <span className="truncate">{donation.ngo?.name || 'NGO Partner'}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 whitespace-nowrap">
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#7567E8]/10 text-[#7567E8] border border-[#7567E8]/20">
                         <Tag className="w-3 h-3" />
                         {donation.category}
                       </span>
                     </td>
-                    <td className="py-4 px-4 text-xs max-w-xs break-words line-clamp-2 text-[#4B5563]">
+                    <td className="py-3.5 px-4 text-xs max-w-xs break-words line-clamp-2 text-[#4B5563]">
                       {donation.description || 'No description provided.'}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-xs">
+                    <td className="py-3.5 px-4 whitespace-nowrap text-xs">
                       {donation.pickupDate ? (
                         <span className="inline-flex items-center gap-1 text-[#111827] font-semibold">
                           <Calendar className="w-3 h-3 text-[#7567E8]" />
                           {donation.pickupDate}
                         </span>
                       ) : (
-                        <span className="text-[#6B7280]">—</span>
+                        <span className="text-[#9CA3AF]">—</span>
                       )}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap">
-                      <span
-                        className={`text-[11px] font-bold tracking-wider px-2.5 py-0.5 rounded border ${getStatusBadgeStyle(
-                          donation.status
-                        )}`}
-                      >
-                        {donation.status}
-                      </span>
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <MobileStatusBadge status={donation.status} size="sm" />
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="py-3.5 px-4 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => setDetailDonationId(donation.id)}
-                          className="p-2 rounded-lg transition-colors border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
+                          className="p-2 rounded-lg transition-colors border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-xs"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4 text-[#7567E8]" />
@@ -295,7 +273,7 @@ export const MyDonationsPage: React.FC = () => {
                         </button>
                         <button
                           onClick={() => setActiveChatDonation(donation)}
-                          className="p-2 rounded-lg transition-colors border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
+                          className="p-2 rounded-lg transition-colors border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-xs"
                           title="Chat with NGO"
                         >
                           <MessageSquare className="w-4 h-4 text-[#4B5563]" />
@@ -308,65 +286,63 @@ export const MyDonationsPage: React.FC = () => {
             </table>
           </div>
 
-          {/* Mobile Card Layout */}
-          <div className="block md:hidden space-y-4">
+          {/* Android Mobile Cards Layout (under md screens) */}
+          <div className="block md:hidden space-y-3">
             {filteredDonations.map((donation) => (
               <div
                 key={donation.id}
-                className="border border-[#E5E7EB] rounded-2xl p-5 space-y-4 bg-white shadow-[0_10px_15px_-3px_rgba(17,24,39,0.04)]"
+                className="border border-[#E5E7EB] rounded-2xl p-4 space-y-3 bg-white shadow-xs active:border-[#7567E8]/50 transition-colors"
               >
+                {/* Header: Category + Status Badge */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full border flex items-center gap-1 bg-[#7567E8]/10 text-[#7567E8] border-[#7567E8]/20">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg border flex items-center gap-1 bg-[#7567E8]/10 text-[#7567E8] border-[#7567E8]/20">
                     <Tag className="w-3 h-3" />
                     {donation.category}
                   </span>
-                  <span
-                    className={`text-[11px] font-bold tracking-wider px-2.5 py-0.5 rounded border ${getStatusBadgeStyle(
-                      donation.status
-                    )}`}
-                  >
-                    {donation.status}
-                  </span>
+                  <MobileStatusBadge status={donation.status} size="sm" />
                 </div>
 
+                {/* NGO & Description */}
                 <div>
-                  <div className="flex items-center gap-2 font-extrabold text-base mb-1 text-[#111827]">
+                  <div className="flex items-center gap-1.5 font-extrabold text-sm mb-1 text-[#111827]">
                     <Building2 className="w-4 h-4 text-[#7567E8] shrink-0" />
-                    <span className="break-words">{donation.ngo?.name || 'NGO Partner'}</span>
+                    <span className="truncate">{donation.ngo?.name || 'NGO Partner'}</span>
                   </div>
-                  <p className="text-xs leading-relaxed break-words line-clamp-3 text-[#4B5563]">
+                  <p className="text-xs leading-relaxed text-[#4B5563] line-clamp-2">
                     {donation.description || 'No description provided.'}
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between text-xs pt-2 border-t border-[#E5E7EB] text-[#4B5563]">
+                {/* Timing Footer */}
+                <div className="flex items-center justify-between text-[11px] pt-2 border-t border-[#E5E7EB] text-[#6B7280]">
                   <span>Requested: {formatDate(donation.createdAt)}</span>
                   {donation.pickupDate && (
                     <span className="flex items-center gap-1 text-[#7567E8] font-bold">
                       <Calendar className="w-3 h-3" />
-                      {donation.pickupDate}
+                      Pickup: {donation.pickupDate}
                     </span>
                   )}
                 </div>
 
+                {/* Thumb-Friendly Action Buttons (44px min touch height) */}
                 <div className="grid grid-cols-3 gap-2 pt-1">
                   <button
                     onClick={() => setDetailDonationId(donation.id)}
-                    className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl text-xs font-bold border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-bold border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-xs min-h-[44px] active:scale-95"
                   >
                     <Eye className="w-3.5 h-3.5 text-[#7567E8]" />
                     Inspect
                   </button>
                   <button
                     onClick={() => setActiveTrackerDonation(donation)}
-                    className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl text-xs font-bold border bg-[#7567E8]/10 hover:bg-[#7567E8]/20 text-[#7567E8] border-[#7567E8]/20"
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-bold border bg-[#7567E8]/10 hover:bg-[#7567E8]/20 text-[#7567E8] border-[#7567E8]/20 min-h-[44px] active:scale-95"
                   >
                     <Navigation className="w-3.5 h-3.5 text-[#7567E8]" />
-                    GPS
+                    Live GPS
                   </button>
                   <button
                     onClick={() => setActiveChatDonation(donation)}
-                    className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl text-xs font-bold border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-sm"
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-bold border bg-white hover:bg-[#F4F2FA] text-[#111827] border-[#E5E7EB] shadow-xs min-h-[44px] active:scale-95"
                   >
                     <MessageSquare className="w-3.5 h-3.5 text-[#4B5563]" />
                     Chat
@@ -378,24 +354,24 @@ export const MyDonationsPage: React.FC = () => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
-              <div className="text-xs text-[#4B5563]">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl border border-[#E5E7EB] bg-white shadow-xs">
+              <div className="text-xs text-[#6B7280]">
                 Page <span className="font-extrabold text-[#111827]">{page + 1}</span> of{' '}
-                <span className="font-extrabold text-[#111827]">{totalPages}</span> ({totalElements} total items)
+                <span className="font-extrabold text-[#111827]">{totalPages}</span> ({totalElements} items)
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((prev) => Math.max(0, prev - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-white text-[#111827] hover:bg-[#F4F2FA] border-[#E5E7EB]"
+                  className="px-3.5 py-2 rounded-xl border border-[#E5E7EB] text-xs font-bold text-[#4B5563] hover:text-[#111827] disabled:opacity-40 min-h-[38px] active:scale-95 flex items-center gap-1"
                 >
-                  <ChevronLeft className="w-4 h-4" /> Previous
+                  <ChevronLeft className="w-4 h-4" /> Prev
                 </button>
                 <button
                   onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed bg-white text-[#111827] hover:bg-[#F4F2FA] border-[#E5E7EB]"
+                  className="px-3.5 py-2 rounded-xl border border-[#E5E7EB] text-xs font-bold text-[#4B5563] hover:text-[#111827] disabled:opacity-40 min-h-[38px] active:scale-95 flex items-center gap-1"
                 >
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
@@ -406,11 +382,11 @@ export const MyDonationsPage: React.FC = () => {
                     setSize(Number(e.target.value));
                     setPage(0);
                   }}
-                  className="border text-xs font-semibold rounded-xl px-2.5 py-1.5 bg-[#F9FAFB] border-[#E5E7EB] text-[#111827] focus:border-[#7567E8]"
+                  className="border text-xs font-semibold rounded-xl px-2.5 py-2 bg-[#F9FAFB] border-[#E5E7EB] text-[#111827] focus:border-[#7567E8] min-h-[38px]"
                 >
-                  <option value={10}>10 per page</option>
-                  <option value={20}>20 per page</option>
-                  <option value={50}>50 per page</option>
+                  <option value={10}>10 / page</option>
+                  <option value={20}>20 / page</option>
+                  <option value={50}>50 / page</option>
                 </select>
               </div>
             </div>
@@ -438,31 +414,21 @@ export const MyDonationsPage: React.FC = () => {
         />
       )}
 
-      {/* Direct Chat Modal */}
+      {/* Direct Chat Bottom Sheet */}
       {activeChatDonation && (
-        <div className="fixed inset-0 z-50 bg-[#111827]/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="border border-[#E5E7EB] rounded-2xl max-w-xl w-full p-6 relative flex flex-col space-y-4 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
-              <div>
-                <h3 className="text-base font-extrabold flex items-center gap-2 text-[#111827]">
-                  <Building2 className="w-4 h-4 text-[#7567E8]" />
-                  Chat with {activeChatDonation.ngo?.name}
-                </h3>
-                <p className="text-xs text-[#4B5563]">
-                  Donation #{activeChatDonation.id.slice(0, 8)} ({activeChatDonation.category})
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveChatDonation(null)}
-                className="p-1.5 rounded-lg transition-colors bg-[#F9FAFB] text-[#4B5563] hover:text-[#111827]"
-              >
-                <X className="w-5 h-5" />
-              </button>
+        <MobileBottomSheet
+          isOpen={Boolean(activeChatDonation)}
+          onClose={() => setActiveChatDonation(null)}
+          title={`Chat with ${activeChatDonation.ngo?.name}`}
+          subtitle={`Donation #${activeChatDonation.id.slice(0, 8)} (${activeChatDonation.category})`}
+          icon={
+            <div className="w-9 h-9 rounded-xl bg-[#7567E8]/10 text-[#7567E8] flex items-center justify-center">
+              <Building2 className="w-4 h-4" />
             </div>
-
-            <CommentThread donationId={activeChatDonation.id} currentUserId={user?.id} />
-          </div>
-        </div>
+          }
+        >
+          <CommentThread donationId={activeChatDonation.id} currentUserId={user?.id} />
+        </MobileBottomSheet>
       )}
     </div>
   );

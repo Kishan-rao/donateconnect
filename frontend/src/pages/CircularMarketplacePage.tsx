@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getActiveResourceTrades } from '../api/nextGenApi';
 import { NgoResourceTrade } from '../types';
-import { RefreshCw, Repeat, Building2, Recycle, CheckCircle2 } from 'lucide-react';
+import { Repeat, Building2, Recycle } from 'lucide-react';
+import { MobilePageHeader } from '../components/common/MobilePageHeader';
 
 export const CircularMarketplacePage: React.FC = () => {
   const [trades, setTrades] = useState<NgoResourceTrade[]>([]);
@@ -15,66 +16,78 @@ export const CircularMarketplacePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8 py-6 max-w-7xl mx-auto px-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            <Recycle className="w-8 h-8 text-emerald-400" />
-            Zero-Waste Circular Exchange & Inter-NGO Trade Board
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            B2B resource exchange board for NGOs to swap surplus items and divert textile/e-waste from landfills
-          </p>
-        </div>
-      </div>
+    <div className="space-y-5 py-4 max-w-7xl mx-auto px-4">
+      <MobilePageHeader
+        title="Zero-Waste Circular Exchange"
+        subtitle="Inter-NGO surplus trading board to divert textiles & e-waste from landfills"
+        badge={
+          <span className="text-[11px] font-bold text-[#047857] bg-[#E6F4EA] px-2.5 py-0.5 rounded-full border border-[#A7F3D0]">
+            {trades.length} Open Trades
+          </span>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl text-center">
-          <div className="text-xl font-extrabold text-emerald-400">1,240 kg</div>
-          <div className="text-xs text-slate-400">Textiles Diverted from Landfill</div>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
+        <div className="bg-white border border-[#E5E7EB] p-3 sm:p-4 rounded-2xl text-center shadow-sm">
+          <div className="text-base sm:text-xl font-black text-[#047857]">1,240 kg</div>
+          <div className="text-[10px] sm:text-xs text-[#6B7280] font-medium leading-tight mt-0.5">
+            Textiles Diverted
+          </div>
         </div>
-        <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl text-center">
-          <div className="text-xl font-extrabold text-indigo-400">450 Units</div>
-          <div className="text-xs text-slate-400">E-Waste Upcycled</div>
+        <div className="bg-white border border-[#E5E7EB] p-3 sm:p-4 rounded-2xl text-center shadow-sm">
+          <div className="text-base sm:text-xl font-black text-[#7567E8]">450 Units</div>
+          <div className="text-[10px] sm:text-xs text-[#6B7280] font-medium leading-tight mt-0.5">
+            E-Waste Upcycled
+          </div>
         </div>
-        <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl text-center">
-          <div className="text-xl font-extrabold text-purple-400">12 Active</div>
-          <div className="text-xs text-slate-400">Inter-NGO Surplus Trades</div>
+        <div className="bg-white border border-[#E5E7EB] p-3 sm:p-4 rounded-2xl text-center shadow-sm">
+          <div className="text-base sm:text-xl font-black text-[#111827]">12 Active</div>
+          <div className="text-[10px] sm:text-xs text-[#6B7280] font-medium leading-tight mt-0.5">
+            Surplus Trades
+          </div>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800 text-slate-400 text-sm">
+        <div className="text-center py-16 bg-white rounded-2xl border border-[#E5E7EB] text-[#6B7280] text-sm shadow-sm">
           Loading inter-NGO trade listings...
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {trades.map((t) => (
-            <div key={t.id} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <span className="text-xs font-bold text-white flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-indigo-400" />
-                  {t.offeringNgo.name}
+            <div
+              key={t.id}
+              className="bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-5 space-y-4 shadow-sm"
+            >
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] pb-3">
+                <span className="text-sm font-bold text-[#111827] flex items-center gap-2 truncate">
+                  <Building2 className="w-4 h-4 text-[#7567E8] shrink-0" />
+                  <span className="truncate">{t.offeringNgo.name}</span>
                 </span>
-                <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                  Active Trade Offer
+                <span className="text-[10px] font-bold text-[#047857] bg-[#E6F4EA] px-2 py-0.5 rounded-full border border-[#A7F3D0] shrink-0">
+                  Active Offer
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs">
-                <div className="space-y-1">
-                  <div className="text-[10px] uppercase font-bold text-slate-500">Offering Surplus</div>
-                  <div className="text-sm font-bold text-indigo-400">{t.offeredQuantity}x {t.offeredCategory}</div>
+              <div className="grid grid-cols-2 gap-2.5 bg-[#FAF8F5] p-3 rounded-xl border border-[#E5E7EB] text-xs">
+                <div className="space-y-0.5">
+                  <div className="text-[10px] uppercase font-bold text-[#6B7280]">Offering Surplus</div>
+                  <div className="text-xs sm:text-sm font-extrabold text-[#7567E8]">
+                    {t.offeredQuantity}x {t.offeredCategory}
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <div className="text-[10px] uppercase font-bold text-slate-500">Requesting in Exchange</div>
-                  <div className="text-sm font-bold text-purple-400">{t.requestedQuantity}x {t.requestedCategory}</div>
+                <div className="space-y-0.5 border-l border-[#E5E7EB] pl-2.5">
+                  <div className="text-[10px] uppercase font-bold text-[#6B7280]">In Exchange</div>
+                  <div className="text-xs sm:text-sm font-extrabold text-[#047857]">
+                    {t.requestedQuantity}x {t.requestedCategory}
+                  </div>
                 </div>
               </div>
 
               <button
                 onClick={() => alert(`Initiated trade request with ${t.offeringNgo.name}!`)}
-                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2"
+                className="w-full h-12 min-h-[48px] rounded-xl bg-[#7567E8] hover:bg-[#5E51CD] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all touch-manipulation"
               >
                 <Repeat className="w-4 h-4" /> Propose Resource Exchange &rarr;
               </button>

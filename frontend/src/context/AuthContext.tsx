@@ -69,7 +69,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     try {
       const res: AuthResponse = await loginApi(data);
-      if (res && !res.requiresOtp && res.token) {
+      if (!res) {
+        throw new Error('No response received from authentication server.');
+      }
+      if (!res.requiresOtp && res.token) {
         setToken(res.token);
         setUser(res.user);
         localStorage.setItem('dc-token', res.token);
@@ -86,7 +89,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     try {
       const res: AuthResponse = await verifyOtpApi(data);
-      if (res && res.token) {
+      if (!res) {
+        throw new Error('No response received from OTP verification server.');
+      }
+      if (res.token) {
         setToken(res.token);
         setUser(res.user);
         localStorage.setItem('dc-token', res.token);
@@ -103,7 +109,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     try {
       const res: AuthResponse = await registerDonorApi(data);
-      if (res && !res.requiresOtp && res.token) {
+      if (!res) {
+        throw new Error('No response received from registration server.');
+      }
+      if (!res.requiresOtp && res.token) {
         setToken(res.token);
         setUser(res.user);
         localStorage.setItem('dc-token', res.token);

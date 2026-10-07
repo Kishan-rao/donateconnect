@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, MicOff, X, Sparkles, CheckCircle2, ArrowRight, Keyboard } from 'lucide-react';
+import { Mic, MicOff, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Category } from '../types';
+import { MobileBottomSheet } from './common/MobileBottomSheet';
 
 interface VoiceAssistantModalProps {
   onClose: () => void;
@@ -110,86 +111,94 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({ onClos
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 text-center space-y-6 relative shadow-2xl">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        <div className="space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto">
-            <Mic className={`w-7 h-7 ${listening ? 'animate-pulse text-rose-400' : ''}`} />
-          </div>
-          <h3 className="text-xl font-extrabold text-white">Live AI Voice Assistant</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Speak into your microphone in real-time or type your request below.
+    <MobileBottomSheet
+      isOpen={true}
+      onClose={onClose}
+      title="Live AI Voice Assistant"
+      subtitle="Speak or type to pre-fill donation categories"
+      icon={
+        <div className="w-9 h-9 rounded-xl bg-[#7567E8]/10 border border-[#7567E8]/20 text-[#7567E8] flex items-center justify-center">
+          <Mic className="w-5 h-5" />
+        </div>
+      }
+      maxWidthClass="max-w-md"
+      footer={
+        <div className="flex items-center justify-end w-full">
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto h-11 min-h-[44px] px-5 rounded-xl font-bold text-xs bg-[#F9FAFB] hover:bg-[#F4F2FA] text-[#111827] border border-[#E5E7EB] transition-colors touch-manipulation flex items-center justify-center"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-4 text-center">
+        {/* Animated Mic Button */}
+        <div className="py-2">
+          <button
+            type="button"
+            onClick={startListening}
+            disabled={listening}
+            className={`w-20 h-20 rounded-full mx-auto flex items-center justify-center transition-all shadow-lg touch-manipulation ${
+              listening
+                ? 'bg-[#DC2626] text-white animate-pulse shadow-[#DC2626]/40 ring-4 ring-[#FEE2E2]'
+                : 'bg-[#7567E8] hover:bg-[#5E51CD] text-white shadow-[#7567E8]/30 hover:scale-105 active:scale-95'
+            }`}
+          >
+            {listening ? (
+              <MicOff className="w-9 h-9 animate-spin" />
+            ) : (
+              <Mic className="w-9 h-9" />
+            )}
+          </button>
+          <p className="text-xs font-bold text-[#111827] mt-3">
+            {listening ? '🎙️ Listening... Speak now!' : 'Tap mic to speak your donation'}
+          </p>
+          <p className="text-[11px] text-[#6B7280] mt-0.5">
+            E.g. "I want to donate winter jackets and warm clothing"
           </p>
         </div>
 
-        {/* Live Mic Control */}
-        <div className="space-y-3">
-          {speechSupported ? (
-            <button
-              type="button"
-              onClick={startListening}
-              disabled={listening}
-              className={`w-full py-3.5 rounded-xl font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 ${
-                listening
-                  ? 'bg-rose-600 text-white animate-pulse'
-                  : 'bg-gradient-to-r from-indigo-600 to-rose-600 hover:scale-[1.02] text-white shadow-indigo-600/30'
-              }`}
-            >
-              {listening ? (
-                <>
-                  <MicOff className="w-4 h-4 animate-spin" /> 🎙️ Listening Live... Speak Now!
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4" /> 🎙️ Click to Speak into Microphone
-                </>
-              )}
-            </button>
-          ) : (
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs rounded-xl">
-              Microphone Web Speech API is not supported in this browser window. You can type your voice request below!
-            </div>
-          )}
+        {!speechSupported && (
+          <div className="p-3 bg-[#FEF3C7] border border-[#FDE68A] text-[#B45309] text-xs rounded-xl text-left">
+            Microphone speech recognition is not supported in this browser window. You can type below!
+          </div>
+        )}
 
-          {/* Text Input Fallback / Edit Spoken Sentence */}
-          <form onSubmit={handleManualSubmit} className="flex gap-2">
-            <input
-              type="text"
-              value={manualInput}
-              onChange={(e) => setManualInput(e.target.value)}
-              placeholder="Or type what you want to donate..."
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-            />
-            <button
-              type="submit"
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl border border-slate-700 transition-colors"
-            >
-              Parse
-            </button>
-          </form>
-        </div>
+        {/* Text Input Fallback / Edit Spoken Sentence */}
+        <form onSubmit={handleManualSubmit} className="flex gap-2 text-left">
+          <input
+            type="text"
+            value={manualInput}
+            onChange={(e) => setManualInput(e.target.value)}
+            placeholder="Or type what you want to donate..."
+            className="flex-1 bg-white border border-[#E5E7EB] rounded-xl px-3.5 h-12 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#7567E8] focus:ring-2 focus:ring-[#7567E8]/20 transition-all"
+          />
+          <button
+            type="submit"
+            className="h-12 min-h-[44px] px-4 rounded-xl bg-[#7567E8] hover:bg-[#5E51CD] text-white text-xs font-bold transition-colors touch-manipulation shrink-0 flex items-center justify-center"
+          >
+            Parse
+          </button>
+        </form>
 
         {/* Real Live Spoken Output */}
         {(transcript || parsedAnalysis) && (
-          <div className="space-y-3 bg-slate-950 p-4 rounded-2xl border border-indigo-500/20 text-left text-xs">
+          <div className="space-y-3 bg-[#FAF8F5] p-4 rounded-2xl border border-[#E5E7EB] text-left text-xs">
             {transcript && (
               <div>
-                <div className="text-[10px] uppercase font-bold text-slate-500 mb-1">Your Captured Speech:</div>
-                <div className="text-white font-semibold italic bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                <div className="text-[10px] uppercase font-bold text-[#6B7280] mb-1">
+                  Captured Speech:
+                </div>
+                <div className="text-[#111827] font-semibold italic bg-white p-3 rounded-xl border border-[#E5E7EB]">
                   "{transcript}"
                 </div>
               </div>
             )}
 
             {parsedAnalysis && (
-              <div className="text-emerald-400 font-bold flex items-center gap-1.5 pt-1">
+              <div className="text-[#047857] font-bold flex items-center gap-1.5 pt-1">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{parsedAnalysis}</span>
               </div>
@@ -199,7 +208,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({ onClos
               <button
                 type="button"
                 onClick={handleApplyDonation}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-600/20 mt-2"
+                className="w-full h-12 min-h-[48px] rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md touch-manipulation mt-2"
               >
                 Apply & Create Donation ({parsedCategory}) <ArrowRight className="w-4 h-4" />
               </button>
@@ -207,6 +216,6 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({ onClos
           </div>
         )}
       </div>
-    </div>
+    </MobileBottomSheet>
   );
 };

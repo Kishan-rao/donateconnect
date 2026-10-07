@@ -2,13 +2,24 @@ import axios from 'axios';
 import { Capacitor } from '@capacitor/core';
 
 const getBaseUrl = (): string => {
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
+  let url = import.meta.env.VITE_API_BASE_URL;
+  if (!url) {
+    if (Capacitor.isNativePlatform()) {
+      url = 'http://192.168.29.227:8080/api';
+    } else {
+      url = '/api';
+    }
   }
-  if (Capacitor.isNativePlatform()) {
-    return 'http://10.0.2.2:8080/api';
+
+  // Normalize: trim whitespace and trailing slashes
+  url = url.trim().replace(/\/+$/, '');
+
+  // Ensure /api suffix exists so relative paths like /auth/register or /health route correctly
+  if (!url.endsWith('/api') && url !== '/api') {
+    url = `${url}/api`;
   }
-  return '/api';
+
+  return url;
 };
 
 const BASE_URL = getBaseUrl();
@@ -18,7 +29,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 15000,
 });
 
 let inMemoryToken: string | null = localStorage.getItem('dc-token');
@@ -46,13 +57,20 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor: Catch 401 Unauthorized errors
+// Response Interceptor: Catch 401 Unauthorized errors on protected requests
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && logoutCallback) {
+    const requestUrl = error.config?.url || '';
+    const isPublicEndpoint = requestUrl.includes('/health') || requestUrl.includes('/auth/');
+    const hasToken = inMemoryToken || localStorage.getItem('dc-token');
+
+    // Only trigger logout callback if an authenticated session received 401
+    // (Never logout merely because a public health check or login attempt returned 401)
+    if (error.response?.status === 401 && !isPublicEndpoint && hasToken && logoutCallback) {
       logoutCallback();
     }
+
     const message = error.response?.data?.message || error.message || 'An unexpected error occurred';
     const err = new Error(message) as any;
     err.response = error.response;

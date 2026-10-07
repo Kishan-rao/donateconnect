@@ -8,90 +8,96 @@ export const AdminProfilePage: React.FC = () => {
 
   if (!user) return null;
 
-  const initial = user.fullName ? user.fullName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+  const initial = user.fullName
+    ? user.fullName.charAt(0).toUpperCase()
+    : user.email.charAt(0).toUpperCase();
 
   return (
-    <div className="max-w-3xl mx-auto py-8 space-y-6">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl space-y-8 relative overflow-hidden">
-        
-        {/* Decorative Background */}
-        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-          <Shield className="w-64 h-64 text-indigo-500" />
-        </div>
-
+    <div className="max-w-2xl mx-auto py-3 sm:py-6 px-1 sm:px-0 space-y-4">
+      <div className="bg-white border border-[#E5E7EB] rounded-3xl p-5 sm:p-8 shadow-xs space-y-6">
         {/* Profile Header */}
-        <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-8 border-b border-slate-800">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-4xl shadow-lg shadow-indigo-500/20 shrink-0 border-4 border-slate-900">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 pb-5 border-b border-[#E5E7EB] text-center sm:text-left">
+          <div className="w-20 h-20 rounded-full bg-[#7567E8] flex items-center justify-center text-white font-extrabold text-3xl shadow-md shadow-[#7567E8]/20 shrink-0">
             {initial}
           </div>
-          <div className="text-center sm:text-left pt-2">
-            <h1 className="text-3xl font-extrabold text-white mb-2">{user.fullName || 'System Administrator'}</h1>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-bold text-xs uppercase tracking-wider border border-indigo-500/30">
-              <Shield className="w-3.5 h-3.5" />
-              {user.role}
-            </span>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[#111827]">
+              {user.fullName || 'System Administrator'}
+            </h1>
+            <p className="text-xs text-[#6B7280] mt-0.5">{user.email}</p>
+            <div className="mt-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#7567E8]/10 text-[#7567E8] font-bold text-[11px] uppercase tracking-wider border border-[#7567E8]/20">
+                <Shield className="w-3.5 h-3.5" />
+                {user.role}
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Profile Details */}
-        <div className="relative grid sm:grid-cols-2 gap-6">
-          <div className="bg-slate-950/50 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
-            <div className="flex items-center gap-3 text-slate-400 mb-1">
-              <User className="w-5 h-5 text-indigo-400" />
-              <span className="text-sm font-semibold uppercase tracking-wider">Full Name</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-[#FAF8F5] p-4 rounded-2xl border border-[#E5E7EB] space-y-1">
+            <div className="flex items-center gap-2 text-[#6B7280]">
+              <User className="w-4 h-4 text-[#7567E8]" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Full Name</span>
             </div>
-            <p className="text-lg font-bold text-slate-100 pl-8">{user.fullName || 'Not provided'}</p>
+            <p className="text-sm sm:text-base font-bold text-[#111827] pl-6">
+              {user.fullName || 'Not provided'}
+            </p>
           </div>
 
-          <div className="bg-slate-950/50 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
-            <div className="flex items-center gap-3 text-slate-400 mb-1">
-              <Mail className="w-5 h-5 text-indigo-400" />
-              <span className="text-sm font-semibold uppercase tracking-wider">Email Address</span>
+          <div className="bg-[#FAF8F5] p-4 rounded-2xl border border-[#E5E7EB] space-y-1">
+            <div className="flex items-center gap-2 text-[#6B7280]">
+              <Mail className="w-4 h-4 text-[#7567E8]" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Email Address</span>
             </div>
-            <p className="text-lg font-bold text-slate-100 pl-8">{user.email}</p>
+            <p className="text-sm sm:text-base font-bold text-[#111827] pl-6 truncate">
+              {user.email}
+            </p>
           </div>
         </div>
 
-        {/* Quick Links / Actions */}
-        <div className="relative pt-6 border-t border-slate-800">
-          <h2 className="text-lg font-bold text-slate-200 mb-4">Administration Links</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Link 
-              to="/admin" 
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold rounded-xl transition-colors border border-indigo-500/20"
+        {/* Administration Links (Stacked on mobile, 3-grid on sm+) */}
+        <div className="pt-2 border-t border-[#E5E7EB] space-y-3">
+          <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider">
+            Admin Consoles
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <Link
+              to="/admin"
+              className="flex items-center justify-center gap-2 h-12 px-4 bg-[#FAF8F5] hover:bg-[#F4F2FA] text-[#7567E8] font-bold text-xs rounded-xl transition-colors border border-[#E5E7EB] active:scale-95"
             >
               <LayoutDashboard className="w-4 h-4" />
-              Dashboard
+              Overview
             </Link>
-            
-            <Link 
-              to="/admin/ngos" 
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold rounded-xl transition-colors border border-indigo-500/20"
+
+            <Link
+              to="/admin/ngos"
+              className="flex items-center justify-center gap-2 h-12 px-4 bg-[#FAF8F5] hover:bg-[#F4F2FA] text-[#7567E8] font-bold text-xs rounded-xl transition-colors border border-[#E5E7EB] active:scale-95"
             >
               <Users className="w-4 h-4" />
               Manage NGOs
             </Link>
-            
-            <Link 
-              to="/admin/donations" 
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold rounded-xl transition-colors border border-indigo-500/20"
+
+            <Link
+              to="/admin/donations"
+              className="flex items-center justify-center gap-2 h-12 px-4 bg-[#FAF8F5] hover:bg-[#F4F2FA] text-[#7567E8] font-bold text-xs rounded-xl transition-colors border border-[#E5E7EB] active:scale-95"
             >
               <Database className="w-4 h-4" />
-              All Donations
+              Audit All
             </Link>
           </div>
-          
-          <div className="mt-6 flex justify-end">
-            <button 
+
+          <div className="pt-2">
+            <button
               onClick={() => logout()}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-950 hover:bg-rose-500/10 text-rose-400 font-bold rounded-xl transition-colors border border-rose-500/20 shadow-sm w-full sm:w-auto"
+              className="w-full h-12 flex items-center justify-center gap-2 px-6 bg-white hover:bg-[#FEE2E2] text-[#DC2626] font-bold text-xs rounded-xl transition-colors border border-[#FECACA] active:scale-[0.98]"
             >
               <LogOut className="w-4 h-4" />
               Sign Out
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

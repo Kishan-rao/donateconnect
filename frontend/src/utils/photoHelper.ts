@@ -11,9 +11,20 @@
  *   3. Data URI: "data:image/..."  → use as-is (legacy inline base64)
  */
 
-const BACKEND_BASE_URL = import.meta.env.VITE_API_BASE_URL
-  ? import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')
-  : '';
+import { Capacitor } from '@capacitor/core';
+
+const getBackendBaseUrl = (): string => {
+  let url = import.meta.env.VITE_API_BASE_URL;
+  if (!url) {
+    if (Capacitor.isNativePlatform()) {
+      return 'http://192.168.29.227:8080';
+    }
+    return '';
+  }
+  return url.replace(/\/api\/?$/, '');
+};
+
+const BACKEND_BASE_URL = getBackendBaseUrl();
 
 /**
  * Resolve a photo URL for display.
