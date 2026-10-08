@@ -135,7 +135,7 @@ export const RegisterPage: React.FC = () => {
                   <input
                     type="text"
                     autoComplete="name"
-                    placeholder="Jane Doe"
+                    placeholder="Enter your full name"
                     {...register('fullName', { required: 'Full name is required' })}
                     className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl pl-10 pr-4 h-12 text-sm sm:text-base text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#7567E8] transition-colors"
                   />
@@ -155,7 +155,7 @@ export const RegisterPage: React.FC = () => {
                     type="email"
                     autoComplete="email"
                     inputMode="email"
-                    placeholder="jane@example.com"
+                    placeholder="Enter your email address"
                     {...register('email', {
                       required: 'Email is required',
                       pattern: {
@@ -180,7 +180,7 @@ export const RegisterPage: React.FC = () => {
                   <input
                     type="password"
                     autoComplete="new-password"
-                    placeholder="Minimum 6 characters"
+                    placeholder="Create a password"
                     {...register('password', {
                       required: 'Password is required',
                       minLength: { value: 6, message: 'Password must be at least 6 characters' },
@@ -204,7 +204,7 @@ export const RegisterPage: React.FC = () => {
                       <input
                         type="text"
                         autoComplete="street-address"
-                        placeholder="123 Community Hub Road, City"
+                        placeholder="Enter NGO facility address"
                         {...register('address', { required: selectedRole === 'NGO' ? 'Address is required' : false })}
                         className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl pl-10 pr-4 h-12 text-sm sm:text-base text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#7567E8] transition-colors"
                       />
@@ -224,7 +224,7 @@ export const RegisterPage: React.FC = () => {
                         type="tel"
                         autoComplete="tel"
                         inputMode="tel"
-                        placeholder="+91 98765 43210"
+                        placeholder="Enter contact phone number"
                         {...register('phone', { required: selectedRole === 'NGO' ? 'Phone number is required' : false })}
                         className="w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl pl-10 pr-4 h-12 text-sm sm:text-base text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#7567E8] transition-colors"
                       />
